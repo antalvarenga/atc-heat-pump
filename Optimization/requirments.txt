@@ -1,0 +1,12 @@
+sklearn
+pandas
+ipykernel
+tespy
+tqdm
+gym
+tensorflow
+torch
+torchvision
+pygame
+seaborn
+pytorch-lightning
