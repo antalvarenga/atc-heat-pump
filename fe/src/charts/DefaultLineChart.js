@@ -1,10 +1,10 @@
 import { ResponsiveContainer, Tooltip } from "recharts";
 import { LineChart, Line, CartesianGrid, XAxis, YAxis } from 'recharts';
+import { margin } from './generalProps';
 
 const DefaultLineChart = (props) => {
-    console.log(props)
     return <ResponsiveContainer width="100%" height={400}>
-        <LineChart width={1000} height={400} data={props.data}>
+        <LineChart width={1000} height={400} data={props.data} margin={margin}>
             <Line
                 type="monotone"
                 dataKey={props.yaxis}

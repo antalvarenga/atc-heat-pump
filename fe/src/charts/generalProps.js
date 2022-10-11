@@ -1,0 +1,1 @@
+export const margin = { top: 5, right: 20, bottom: 5, left: 20 }

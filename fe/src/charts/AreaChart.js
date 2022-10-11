@@ -1,9 +1,9 @@
 import { Area, ReferenceLine, ResponsiveContainer } from "recharts";
 import { AreaChart, Tooltip, CartesianGrid, XAxis, YAxis } from 'recharts';
+import { margin } from './generalProps';
 const DefaultAreaChart = (props) => {
-    console.log(props)
     return <ResponsiveContainer width="100%" height={400}>
-        <AreaChart width={1000} height={400} data={props.data}>
+        <AreaChart width={1000} height={400} data={props.data} margin={margin}>
             <defs>
                 <linearGradient id="colorUv" x1="0" y1="0" x2="0" y2="1">
                 <stop offset="5%" stopColor="#8884d8" stopOpacity={0.8}/>
