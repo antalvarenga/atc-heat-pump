@@ -10,11 +10,11 @@ app = Flask(__name__)
 def index():
     return 'index2'
 
-@app.route("/optimizeDaily")
+@app.route("/optimizeDaily/hourly")
 def optimizeDaily():
     """
     Usage: 
-        response = requests.get("http://localhost:5000/optimizeDaily?start_date=2021-12-01&end_date=2021-12-31")
+        response = requests.get("http://localhost:5000/optimizeDaily/hourly?start_date=2021-12-01&end_date=2021-12-31")
         response.json()
     """
     

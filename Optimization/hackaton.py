@@ -1,3 +1,4 @@
+from itertools import accumulate
 from scipy.optimize import linprog
 import numpy as np
 import math
@@ -563,30 +564,43 @@ def get_DataByDay(start_date, end_date, confort_score_coef=0.00):
     results = get_data_from_multiple_days(start_date, end_date, confort_score_coef=confort_score_coef)
     
 
+    accumulated_cost_across_days = []
+    accumulated_comsumption_across_days = []
+    accumulated_comfort_across_days = []
+
     for i in range(len(results)):
         #add i days to start date
         day = datetime.strptime(start_date, '%Y-%m-%d') + timedelta(days=i)
         energy_cost = results[i]['OptimizeCost'][1]
         confort_score = results[i]['OptimizeCost'][2]
-        accumulated_energy_comsumption = results[i]['OptimizeCost'][7][-1]
+        daily_energy_comsumption = results[i]['OptimizeCost'][7][-1]
 
         temperature_avg= sum(results[i]['OptimizeCost'][8])/len(results[i]['OptimizeCost'][8])
         avg_energy_price = sum(results[i]['energy_array'])/len(results[i]['energy_array'])
-        #print("Day: ", day)
-        #print("Energy Cost: ", energy_cost)
-        #print("Confort Score: ", confort_score)
-        #print("Accumulated Energy Consumption: ", accumulated_energy_comsumption)
-        #print("Temperature Avg: ", temperature_avg)
-        #print("Avg Energy Price (per hour): ", avg_energy_price)
-        #print("")
+        
+        
+        accumulated_cost_across_days.append(energy_cost)
+        accumulated_comsumption_across_days.append(daily_energy_comsumption)
+        accumulated_comfort_across_days.append(confort_score)
+
+        if i > 0:
+            accumulated_cost_across_days[i] = accumulated_cost_across_days[i-1] + energy_cost
+            accumulated_comsumption_across_days[i] = accumulated_comsumption_across_days[i-1] + daily_energy_comsumption
+            accumulated_comfort_across_days[i] = accumulated_comfort_across_days[i-1] + confort_score
+
+
         
         json_object.append({
             "day": day.strftime('%Y-%m-%d'),
-            "energy_cost": energy_cost,
-            "confort_score": confort_score,
-            "accumulated_energy_consumption": accumulated_energy_comsumption,
-            "temperature_avg": temperature_avg,
-            "avg_energy_price": avg_energy_price
+            "daily_energy_cost": energy_cost,
+            "daily_confort_score": confort_score,
+            "daily_energy_comsumption": daily_energy_comsumption,
+            "daily_temperature_avg": temperature_avg,
+            "daily_avg_energy_price": avg_energy_price,
+            "accumulated_cost_across_days": accumulated_cost_across_days[i],
+            "accumulated_comsumption_across_days": accumulated_comsumption_across_days[i],
+            "accumulated_comfort_across_days": accumulated_comfort_across_days[i]
+
         })
     
     return json_object
