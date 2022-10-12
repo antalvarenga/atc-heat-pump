@@ -302,19 +302,20 @@ def saveJsonFIle(json_object, file_name):
     with open(file_name, 'w') as f:
         json.dump(json_object, f, indent=4)
 
+#read first entry of results
 def printResults(results):
     #results is a list of results for each day
     #prints the results for each day
     for i in range(len(results)):
         print("Day: ", i+1)
-        print("Policy: ", results[i][0])
-        print("Electricity Cost (euros): ", results[i][1])
-        print("Confort Score: ", results[i][2])
-        print("Accumulated Comfort Score: ", results[i][3])
-        print("Atual Cost: ", results[i][4])
-        print("Accumulated Cost: ", results[i][5])
-        print("Atual Consumption: ", results[i][6])
-        print("Accumulated Consumption: ", results[i][7])
+        print("Policy: ", results[i]['OptimizeCost'][0])
+        print("Electricity Cost (euros): ", results[i]['OptimizeCost'][1])
+        print("Confort Score: ", results[i]['OptimizeCost'][2])
+        print("Accumulated Comfort Score: ", results[i]['OptimizeCost'][3])
+        print("Atual Cost: ", results[i]['OptimizeCost'][4])
+        print("Accumulated Cost: ", results[i]['OptimizeCost'][5])
+        print("Atual Consumption: ", results[i]['OptimizeCost'][6])
+        print("Accumulated Consumption: ", results[i]['OptimizeCost'][7])
         print("")
 
     
@@ -553,6 +554,42 @@ def get_data_from_multiple_days(start_date, end_date, confort_score_coef=0.00):
         })
 
     return results
+
+def get_DataByDay(start_date, end_date, confort_score_coef=0.00):
+    #receives a start date and end date and returns a list of dictionaries with the data for each day
+    #the data is the same as the json object
+
+    json_object = []
+    results = get_data_from_multiple_days(start_date, end_date, confort_score_coef=confort_score_coef)
+    
+
+    for i in range(len(results)):
+        #add i days to start date
+        day = datetime.strptime(start_date, '%Y-%m-%d') + timedelta(days=i)
+        energy_cost = results[i]['OptimizeCost'][1]
+        confort_score = results[i]['OptimizeCost'][2]
+        accumulated_energy_comsumption = results[i]['OptimizeCost'][7][-1]
+
+        temperature_avg= sum(results[i]['OptimizeCost'][8])/len(results[i]['OptimizeCost'][8])
+        avg_energy_price = sum(results[i]['energy_array'])/len(results[i]['energy_array'])
+        #print("Day: ", day)
+        #print("Energy Cost: ", energy_cost)
+        #print("Confort Score: ", confort_score)
+        #print("Accumulated Energy Consumption: ", accumulated_energy_comsumption)
+        #print("Temperature Avg: ", temperature_avg)
+        #print("Avg Energy Price (per hour): ", avg_energy_price)
+        #print("")
+        
+        json_object.append({
+            "day": day.strftime('%Y-%m-%d'),
+            "energy_cost": energy_cost,
+            "confort_score": confort_score,
+            "accumulated_energy_consumption": accumulated_energy_comsumption,
+            "temperature_avg": temperature_avg,
+            "avg_energy_price": avg_energy_price
+        })
+    
+    return json_object
 
 
 

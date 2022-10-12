@@ -1,6 +1,6 @@
 from flask import Flask, jsonify, request
 from flask import url_for
-from hackaton import get_data_from_multiple_days, get_data_from_month, get_data_from_week, get_temperature_array, get_energy_array, calculateWeights, OptimizeCost, create_json_object, simulate_policy, simulate_policy_JSON_format, generate_Standard_Policy
+from hackaton import get_data_from_multiple_days, get_data_from_month, get_data_from_week, get_temperature_array, get_energy_array, calculateWeights, OptimizeCost, create_json_object, simulate_policy, simulate_policy_JSON_format, generate_Standard_Policy, get_DataByDay
 from scipy.optimize import linprog
 
 
@@ -28,6 +28,25 @@ def optimizeDaily():
     results = get_data_from_multiple_days(start_date, end_date)
     json_object = create_json_object(results, start_date)
     return jsonify(json_object)
+
+
+@app.route("/optimizeDaily/daily")
+def optimizeDaily_daily_granularity():
+    """
+    Usage: 
+        response = requests.get("http://localhost:5000/optimizeDaily/month?start_date=2021-12-01&end_date=2021-12-31")
+        response.json()
+    """
+    
+
+    start_date = request.args.get('start_date')
+    end_date = request.args.get('end_date')
+
+    json_object = get_DataByDay(start_date, end_date)
+    
+    
+    return jsonify(json_object)
+
 
 
 @app.route("/standardPolicy")
