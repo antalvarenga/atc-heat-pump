@@ -1,7 +1,9 @@
 import { ResponsiveContainer, Tooltip } from "recharts";
 import { LineChart, Line, CartesianGrid, XAxis, YAxis } from 'recharts';
 import { DefaultTooltipContent } from 'recharts/lib/component/DefaultTooltipContent';
-import { margin } from './generalProps';
+import { colors, margin } from './generalProps';
+import CustomTooltip from './CustomTooltip';
+import CustomAxisTick from './CustomAxisTick';
 
 function formatYAxis(value) {
     switch(value) {
@@ -17,19 +19,8 @@ function formatYAxis(value) {
   }
 
 const formatter = (value, name, props) => {
-  return [formatYAxis(value), "Mode", props]
+  return [formatYAxis(value), "Modo"]
 }
-
- const CustomTooltip = props => {
-  if (!props.active) {
-      return null
-  }
-
-  // Add the new label here with the label prop
-  const day = props.payload[0].payload.day
-  const hour = props.payload[0].payload.hour
-  return <DefaultTooltipContent {...props} label={`${day} ${hour}h`}/>;
-};
 
 const ModeLineChart = (props) => {
     return <ResponsiveContainer width="100%" height={400}>
@@ -37,10 +28,10 @@ const ModeLineChart = (props) => {
             <Line
                 type="monotone"
                 dataKey={props.yaxis}
-                stroke="#8884d8"
+                stroke={colors.green}
             />
             <CartesianGrid stroke="#ccc" strokeDasharray="5 5" />
-            <XAxis dataKey="day" />
+            <XAxis dataKey="day" tick={<CustomAxisTick />}/>
             <YAxis dataKey="mode" tickCount={3} tickFormatter={formatYAxis}/>
             <Tooltip content={<CustomTooltip formatter={formatter}/>} />
         </LineChart>

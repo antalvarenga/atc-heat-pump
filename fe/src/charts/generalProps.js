@@ -1,1 +1,5 @@
-export const margin = { top: 5, right: 20, bottom: 5, left: 20 }
+export const margin = { top: 5, right: 40, bottom: 40, left: 20 }
+
+export const colors = {
+    green: "#2CDA9D"
+}

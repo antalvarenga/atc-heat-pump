@@ -22,7 +22,7 @@ function App() {
               <h5>By Cloud Team</h5>
             </div>
             <div>
-              <p>Os gráficos seguintes são para o mês de dezembro de 2021.</p>
+              <p>Os gráficos seguintes são para a cidade de Bragança, em dezembro de 2021.</p>
             </div>
             <Card {...cardStyles}>
                 <h2>Modo de Funcionamento</h2>
