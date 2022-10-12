@@ -183,14 +183,14 @@ def printResults(results):
     #prints the results for each day
     for i in range(len(results)):
         print("Day: ", i+1)
-        print("Policy: ", results[i][0])
-        print("Electricity Cost (euros): ", results[i][1])
-        print("Confort Score: ", results[i][2])
-        print("Accumulated Comfort Score: ", results[i][3])
-        print("Atual Cost: ", results[i][4])
-        print("Accumulated Cost: ", results[i][5])
-        print("Atual Consumption: ", results[i][6])
-        print("Accumulated Consumption: ", results[i][7])
+        print("Policy: ", results[i]['OptimizeCost'][0])
+        print("Electricity Cost (euros): ", results[i]['OptimizeCost'][1])
+        print("Confort Score: ", results[i]['OptimizeCost'][2])
+        print("Accumulated Comfort Score: ", results[i]['OptimizeCost'][3])
+        print("Atual Cost: ", results[i]['OptimizeCost'][4])
+        print("Accumulated Cost: ", results[i]['OptimizeCost'][5])
+        print("Atual Consumption: ", results[i]['OptimizeCost'][6])
+        print("Accumulated Consumption: ", results[i]['OptimizeCost'][7])
         print("")
 
 #function to optimize cost for all days in a month
@@ -573,6 +573,12 @@ def get_DataByDay(start_date, end_date, confort_score_coef=0.00):
         day = datetime.strptime(start_date, '%Y-%m-%d') + timedelta(days=i)
         energy_cost = results[i]['OptimizeCost'][1]
         confort_score = results[i]['OptimizeCost'][2]
+
+        max_energy_cost_hours = max(results[i]['OptimizeCost'][4])
+        min_energy_cost_hours = max(results[i]['OptimizeCost'][4])
+        max_energy_comsumption_hours = max(results[i]['OptimizeCost'][6])
+        min_energy_comsumption_hours = max(results[i]['OptimizeCost'][6])
+
         daily_energy_comsumption = results[i]['OptimizeCost'][7][-1]
 
         temperature_avg= sum(results[i]['OptimizeCost'][8])/len(results[i]['OptimizeCost'][8])
@@ -599,7 +605,12 @@ def get_DataByDay(start_date, end_date, confort_score_coef=0.00):
             "daily_avg_energy_price": avg_energy_price,
             "accumulated_cost_across_days": accumulated_cost_across_days[i],
             "accumulated_comsumption_across_days": accumulated_comsumption_across_days[i],
-            "accumulated_comfort_across_days": accumulated_comfort_across_days[i]
+            "accumulated_comfort_across_days": accumulated_comfort_across_days[i],
+            "max_energy_cost_hour": max_energy_cost_hours,
+            "min_energy_cost_hour": min_energy_cost_hours,
+            "max_energy_comsumption_hour": max_energy_comsumption_hours,
+            "min_energy_comsumption_hour": min_energy_comsumption_hours
+
 
         })
     
