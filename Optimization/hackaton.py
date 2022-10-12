@@ -5,6 +5,7 @@ from electricity_prices import read_prices
 from datetime import datetime, timedelta
 import json
 import pandas as pd
+import requests
 
 
 #Global variables
@@ -175,22 +176,6 @@ def get_energy_array(date_string):
     energy_array = read_prices(t0, t0)[0]
     return energy_array
 
-#function to optimize cost for multiple days
-def get_data_from_multiple_days(start_date, end_date, confort_score_coef=0.05):
-    #start_date and end_date are strings in the format '2021-12-01'
-    #returns a list of results for each day
-    results = []
-    start_date = pd.to_datetime(start_date)
-    end_date = pd.to_datetime(end_date)
-    for i in range((end_date-start_date).days+1):
-        date = start_date + pd.Timedelta(days=i)
-        temperature_array = get_temperature_array(date)
-        energy_array = get_energy_array(date)
-        print(energy_array)
-        weights, consumption, cost = calculateWeights(temperature_array, energy_array, confort_score_coef=confort_score_coef)
-        results.append(OptimizeCost(weights, cost, consumption, temperature_array, minumum_confort_score=124))
-
-    return results
 
 def printResults(results):
     #results is a list of results for each day
@@ -329,6 +314,53 @@ def printResults(results):
         print("Atual Consumption: ", results[i][6])
         print("Accumulated Consumption: ", results[i][7])
         print("")
+
+    
+
+def get_temperature_array_from_api(start_date):
+    response = requests.get("http://localhost:5002/?start_date="+start_date+"&end_date="+start_date)
+    temperature_array=[]
+    for i in range(len(response.json())):
+        temperature_array.append(response.json()[i]['temperature'])
+    
+    return temperature_array[0]
+
+
+def get_energy_array_from_api(start_date, end_date):
+    #get energy cost array
+    response = requests.get("http://localhost:5001/?start_date="+start_date+"&end_date="+end_date)
+    energy_cost_array = []
+    for i in range(len(response.json())):
+        energy_cost_array.append(response.json()[i]['price'])
+
+    #split array into arrays of 24 dimensions
+    energy_cost_array = np.array_split(energy_cost_array, len(energy_cost_array)/24)
+    return energy_cost_array
+
+
+
+#function to optimize cost for multiple days
+def get_data_from_multiple_days(start_date, end_date, confort_score_coef=0.05):
+    #start_date and end_date are strings in the format '2021-12-01'
+    #returns a list of results for each day
+    results = []
+    start_date = pd.to_datetime(start_date)
+    end_date = pd.to_datetime(end_date)
+    energy_arrays = get_energy_array_from_api(start_date.strftime('%Y-%m-%d'), end_date.strftime('%Y-%m-%d'))
+
+    for i in range((end_date-start_date).days+1):
+        date = start_date + pd.Timedelta(days=i)
+        #temperature_array = get_temperature_array(date)
+        temperature_array= get_temperature_array_from_api(date.strftime('%Y-%m-%d'))
+        #energy_array = get_energy_array(date)
+        energy_array = energy_arrays[i]
+
+        weights, consumption, cost = calculateWeights(temperature_array, energy_array, confort_score_coef=confort_score_coef)
+        results.append(OptimizeCost(weights, cost, consumption, temperature_array, minumum_confort_score=124))
+
+    return results
+
+
 
 #main
 def main():

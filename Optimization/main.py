@@ -13,7 +13,7 @@ def index():
 @app.route("/optimizeDaily")
 def optimizeDaily():
     #PRINT KWAJALIKWARGS OF linprog
-    print(linprog.__doc__)
+    #print(linprog.__doc__)
 
     start_date = request.args.get('start_date')
     end_date = request.args.get('end_date')
@@ -28,3 +28,4 @@ def optimizeDaily():
 
 with app.test_request_context():
     print(url_for('index'))
+
