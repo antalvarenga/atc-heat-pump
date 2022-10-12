@@ -244,14 +244,14 @@ def create_json_object(results, start_date):
         
         hours = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23]
         
-        accumulated_cost_per_hour = results[i][4]
+        accumulated_cost_per_hour = results[i]['OptimizeCost'][4]
         for j in range(1, len(accumulated_cost_per_hour)):
             accumulated_cost_per_hour[j] = accumulated_cost_per_hour[j]+accumulated_cost_per_hour[j-1]
 
 
         for hour in hours:
             #hour
-            Mode_for_that_hour = results[i][0][hour]
+            Mode_for_that_hour = results[i]['OptimizeCost'][0][hour]
             #swap mode for 0, 1 and 2
             if Mode_for_that_hour == 'off':
                 Mode_for_that_hour = 0
@@ -261,16 +261,17 @@ def create_json_object(results, start_date):
                 Mode_for_that_hour = 2
 
 
-            Energy_cost_for_that_complete_day = results[i][1]
-            Comfort_score_for_that_complete_day = results[i][2]
-            Accumulated_daily_comfort_score_until_that_hour = results[i][3][hour]
-            Energy_cost_for_that_hour = results[i][4][hour]
+            Energy_cost_for_that_complete_day = results[i]['OptimizeCost'][1]
+            Comfort_score_for_that_complete_day = results[i]['OptimizeCost'][2]
+            Accumulated_daily_comfort_score_until_that_hour = results[i]['OptimizeCost'][3][hour]
+            Energy_cost_for_that_hour = results[i]['OptimizeCost'][4][hour]
             accumulated_energy_cost_that_hour = accumulated_cost_per_hour[hour]
-            Accumulated_daily_energy_cost_until_that_hour = results[i][5][hour]
-            Consumption_for_that_hour = results[i][6][hour]
-            Accumulated_daily_consumption_until_that_hour = results[i][7][hour]
-            
-            exterior_temperature = results[i][8][hour]
+            Accumulated_daily_energy_cost_until_that_hour = results[i]['OptimizeCost'][5][hour]
+            Consumption_for_that_hour = results[i]['OptimizeCost'][6][hour]
+            Accumulated_daily_consumption_until_that_hour = results[i]['OptimizeCost'][7][hour]
+            exterior_temperature = results[i]['OptimizeCost'][8][hour]
+
+            Energy_Price_hour = results[i]['energy_array'][hour]
 
 
             json_object.append({
@@ -285,7 +286,8 @@ def create_json_object(results, start_date):
                 'Accumulated_daily_consumption_until_that_hour': Accumulated_daily_consumption_until_that_hour,
                 'Comfort_score_for_that_complete_day': Comfort_score_for_that_complete_day,
                 'Accumulated_daily_comfort_score_until_that_hour': Accumulated_daily_comfort_score_until_that_hour,
-                'exterior_temperature': exterior_temperature
+                'exterior_temperature': exterior_temperature, 
+                'energy_price': Energy_Price_hour
             })
         
     return json_object
@@ -339,8 +341,196 @@ def get_energy_array_from_api(start_date, end_date):
 
 
 
+def generate_Standard_Policy():
+    """
+    O padrão normal de utilização de uma bomba de calor geralmente é definido semanalmente em que a bomba
+    de calor trabalha diariamente em modo Comfort das 6:30 às 21:30 e Eco das 00:00 às 6:30 e depois das 21:30
+    até à 00:00.
+
+    Let's assume 7and 22h
+    """
+    policy = []
+    for i in range(24):
+        if i < 6 or i >= 21:
+            policy.append('conf')
+        else:
+            policy.append('eco')
+    return policy
+
+def simulate_policy(policy, date):
+    #get the temperature array
+    #temperature_array = get_temperature_array(date)
+    temperature_array = get_temperature_array_from_api(date)
+
+    #get the energy array
+
+    #energy_cost_array = get_energy_array(date)
+    energy_cost_array = get_energy_array_from_api(date, date)[0]
+    print(energy_cost_array)
+    #calculate the weights
+
+    #calculate the weights for each hour
+    comsumption = []
+    cost = []
+
+    for i in range(len(temperature_array)):
+        mode = policy[i]
+        external_temp = temperature_array[i]
+        if mode == 'off':
+            #1KW/hour regardless of temperature
+            comsumption.append(MODE_OFF_CONSUMPTION)
+            cost.append(energy_cost_array[i]*MODE_OFF_CONSUMPTION)
+        elif mode == 'eco':
+            if external_temp < 10:
+                #1.6KW/hour
+                comsumption.append(MODE_ECO_CONSUMPTION_TEMPERATURE_LOWER_10)
+                cost.append(energy_cost_array[i]*MODE_ECO_CONSUMPTION_TEMPERATURE_LOWER_10)
+            elif external_temp >= 10 and external_temp <= 20:
+                #0.8KW/hour
+                comsumption.append(MODE_ECO_CONSUMPTION_TEMPERATURE_BIGGER_10_LOWER_20)
+                cost.append(energy_cost_array[i]*MODE_ECO_CONSUMPTION_TEMPERATURE_BIGGER_10_LOWER_20)
+            elif external_temp > 20:
+                #0.4KW/hour
+                comsumption.append(MODE_ECO_CONSUMPTION_TEMPERATURE_BIGGER_20)
+                cost.append(energy_cost_array[i]*MODE_ECO_CONSUMPTION_TEMPERATURE_BIGGER_20)
+        elif mode == 'conf':
+            if external_temp < 0:
+                #2.4KW/hour+9KW/hour
+                comsumption.append(MODE_CONFORT_CONSUMPTION_TEMPERATURE_LOWER_0)
+                cost.append(energy_cost_array[i]*(MODE_CONFORT_CONSUMPTION_TEMPERATURE_LOWER_0))
+            elif external_temp < 10:
+                #2.4KW/hour
+                comsumption.append(MODE_CONFORT_CONSUMPTION_TEMPERATURE_BIGGER_0_LOWER_10)
+                cost.append(energy_cost_array[i]*MODE_CONFORT_CONSUMPTION_TEMPERATURE_BIGGER_0_LOWER_10)
+            elif external_temp >= 10 and external_temp <= 20:
+                #1.6KW/hour
+                comsumption.append(MODE_CONFORT_CONSUMPTION_TEMPERATURE_BIGGER_10_LOWER_20)
+                cost.append(energy_cost_array[i]*MODE_CONFORT_CONSUMPTION_TEMPERATURE_BIGGER_10_LOWER_20)
+            elif external_temp > 20:
+                #0.8KW/hour
+                comsumption.append(MODE_CONFORT_CONSUMPTION_TEMPERATURE_BIGGER_20)
+                cost.append(energy_cost_array[i]*MODE_CONFORT_CONSUMPTION_TEMPERATURE_BIGGER_20)
+
+
+    return comsumption, cost
+
+
+def simulate_policy_JSON_format(policy, date):
+    #get the temperature array
+    #temperature_array = get_temperature_array(date)
+    temperature_array = get_temperature_array_from_api(date)
+
+    #get the energy array
+
+    #energy_cost_array = get_energy_array(date)
+    energy_cost_array = get_energy_array_from_api(date, date)[0]
+    #print(energy_cost_array)
+    #calculate the weights
+
+    #calculate the weights for each hour
+    comsumption = []
+    cost = []
+    comfort = []
+
+    for i in range(len(temperature_array)):
+        mode = policy[i]
+        external_temp = temperature_array[i]
+        if mode == 'off':
+            #1KW/hour regardless of temperature
+            comsumption.append(MODE_OFF_CONSUMPTION)
+            cost.append(energy_cost_array[i]*MODE_OFF_CONSUMPTION)
+            comfort.append(0)
+        elif mode == 'eco':
+            if external_temp < 10:
+                #1.6KW/hour
+                comsumption.append(MODE_ECO_CONSUMPTION_TEMPERATURE_LOWER_10)
+                cost.append(energy_cost_array[i]*MODE_ECO_CONSUMPTION_TEMPERATURE_LOWER_10)
+                comfort.append(CONFORT_PROVIDED_MODE_ECO)
+            elif external_temp >= 10 and external_temp <= 20:
+                #0.8KW/hour
+                comsumption.append(MODE_ECO_CONSUMPTION_TEMPERATURE_BIGGER_10_LOWER_20)
+                cost.append(energy_cost_array[i]*MODE_ECO_CONSUMPTION_TEMPERATURE_BIGGER_10_LOWER_20)
+                comfort.append(CONFORT_PROVIDED_MODE_ECO)
+            elif external_temp > 20:
+                #0.4KW/hour
+                comsumption.append(MODE_ECO_CONSUMPTION_TEMPERATURE_BIGGER_20)
+                cost.append(energy_cost_array[i]*MODE_ECO_CONSUMPTION_TEMPERATURE_BIGGER_20)
+                comfort.append(CONFORT_PROVIDED_MODE_ECO)
+        elif mode == 'conf':
+            if external_temp < 0:
+                #2.4KW/hour+9KW/hour
+                comsumption.append(MODE_CONFORT_CONSUMPTION_TEMPERATURE_LOWER_0)
+                cost.append(energy_cost_array[i]*(MODE_CONFORT_CONSUMPTION_TEMPERATURE_LOWER_0))
+                comfort.append(CONFORT_PROVIDED_MODE_CONFORT)
+            elif external_temp < 10:
+                #2.4KW/hour
+                comsumption.append(MODE_CONFORT_CONSUMPTION_TEMPERATURE_BIGGER_0_LOWER_10)
+                cost.append(energy_cost_array[i]*MODE_CONFORT_CONSUMPTION_TEMPERATURE_BIGGER_0_LOWER_10)
+                comfort.append(CONFORT_PROVIDED_MODE_CONFORT)
+            elif external_temp >= 10 and external_temp <= 20:
+                #1.6KW/hour
+                comsumption.append(MODE_CONFORT_CONSUMPTION_TEMPERATURE_BIGGER_10_LOWER_20)
+                cost.append(energy_cost_array[i]*MODE_CONFORT_CONSUMPTION_TEMPERATURE_BIGGER_10_LOWER_20)
+                comfort.append(CONFORT_PROVIDED_MODE_CONFORT)
+            elif external_temp > 20:
+                #0.8KW/hour
+                comsumption.append(MODE_CONFORT_CONSUMPTION_TEMPERATURE_BIGGER_20)
+                cost.append(energy_cost_array[i]*MODE_CONFORT_CONSUMPTION_TEMPERATURE_BIGGER_20)
+                comfort.append(CONFORT_PROVIDED_MODE_CONFORT)
+                
+                
+                
+    accumulated_cost = []
+    
+    for i in range(len(cost)):
+        if i == 0:
+            accumulated_cost.append(cost[i])
+        else:
+            accumulated_cost.append(accumulated_cost[i-1]+cost[i])
+
+    accumulated_comsumption = []
+
+    for i in range(len(comsumption)):
+        if i == 0:
+            accumulated_comsumption.append(comsumption[i])
+        else:
+            accumulated_comsumption.append(accumulated_comsumption[i-1]+comsumption[i])
+
+    accumulated_comfort = []
+
+    for i in range(len(comfort)):
+        if i == 0:
+            accumulated_comfort.append(comfort[i])
+        else:
+            accumulated_comfort.append(accumulated_comfort[i-1]+comfort[i])
+
+    json_object = []
+
+
+
+    for i in range(len(temperature_array)):
+        json_object.append({
+                    'hour': i,
+                    'day': date,
+                    "mode": policy[i],
+                    'Energy_cost_for_that_complete_day': accumulated_cost[-1],
+                    'accumulated_energy_cost_that_hour': accumulated_cost[i],
+                    'Energy_cost_for_that_hour': cost[i],
+                    'Accumulated_daily_comfort_score_until_that_hour': accumulated_comfort[i],
+                    'Consumption_for_that_hour': comsumption[i],
+                    'Accumulated_daily_consumption_until_that_hour': accumulated_comsumption[i],
+                    'Comfort_score_for_that_complete_day': accumulated_comfort[-1],
+                    'Accumulated_daily_comfort_score_until_that_hour': accumulated_comfort[i],
+                    'exterior_temperature': temperature_array[i],
+                    'energy_price': energy_cost_array[i]
+                })
+            
+
+    return json_object
+
+
 #function to optimize cost for multiple days
-def get_data_from_multiple_days(start_date, end_date, confort_score_coef=0.05):
+def get_data_from_multiple_days(start_date, end_date, confort_score_coef=0.00):
     #start_date and end_date are strings in the format '2021-12-01'
     #returns a list of results for each day
     results = []
@@ -356,7 +546,11 @@ def get_data_from_multiple_days(start_date, end_date, confort_score_coef=0.05):
         energy_array = energy_arrays[i]
 
         weights, consumption, cost = calculateWeights(temperature_array, energy_array, confort_score_coef=confort_score_coef)
-        results.append(OptimizeCost(weights, cost, consumption, temperature_array, minumum_confort_score=124))
+        #append OptimizeCost and energyARRAY
+        results.append({
+            'OptimizeCost': OptimizeCost(weights, cost, consumption, temperature_array, minumum_confort_score=124),
+            'energy_array': energy_array
+        })
 
     return results
 
