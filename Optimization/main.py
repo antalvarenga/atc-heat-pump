@@ -2,7 +2,7 @@ from calendar import month
 from flask import Flask, jsonify, request
 from flask import url_for
 from flask_cors import CORS
-from hackaton import get_data_from_multiple_days, get_data_from_month, get_data_from_week, get_temperature_array, get_energy_array, calculateWeights, OptimizeCost, create_json_object, simulate_policy, simulate_policy_JSON_format_hourly, generate_Standard_Policy, get_DataByDay_accumulatePeriod, get_DataByDay_AccumulatingWeek, simulate_policy_JSON_format_period, simulate_policy_JSON_format_week, getAggratedData_Hourly
+from hackaton import get_data_from_multiple_days, getAggratedData_free, create_json_object, simulate_policy_JSON_format_hourly, generate_Standard_Policy, get_DataByDay_accumulatePeriod, get_DataByDay_AccumulatingWeek, simulate_policy_JSON_format_period, getAggratedData_Hourly, getAggratedData_weekly
 from scipy.optimize import linprog
 from datetime import datetime, timedelta
 from thermal_model import get_thermal_model_DataByDay
@@ -69,8 +69,6 @@ def optimizeDaily_weekly_granularity():
     
     return jsonify(json_object)
     
-    
-    return 
 
 
 
@@ -133,9 +131,7 @@ def standardPolicy_weekly_granularity():
     start_date = request.args.get('start_date')
     end_date = request.args.get('end_date')
 
-    policy = generate_Standard_Policy()
-    
-    results = simulate_policy_JSON_format_week(policy, start_date, end_date)
+    results = getAggratedData_weekly(start_date, end_date)
 
 
     return jsonify(results)
@@ -150,13 +146,51 @@ def aggregated_hourly_granularity():
     #both endpoint together
     """
     Usage: 
-        response = requests.get("http://localhost:5010/joint/weekly?start_date=2021-12-01&end_date=2021-12-31")
+        response = requests.get("http://localhost:5010/aggregated/hourly?start_date=2021-12-01&end_date=2021-12-31")
         response.json()
     """
 
     start_date = request.args.get('start_date')
     end_date = request.args.get('end_date')
     json_object = getAggratedData_Hourly(start_date, end_date)
+
+
+    return jsonify(json_object)
+
+with app.test_request_context():
+    print(url_for('index'))
+
+
+@app.route("/aggregated/weekly")
+def aggregated_weekly_with_daily_granularity():
+    #both endpoint together
+    """
+    Usage: 
+        response = requests.get("http://localhost:5010/aggregated/hourly?start_date=2021-12-01&end_date=2021-12-31")
+        response.json()
+    """
+
+
+
+    start_date = request.args.get('start_date')
+    end_date = request.args.get('end_date')
+    json_object = getAggratedData_weekly(start_date, end_date)
+
+
+    return jsonify(json_object)
+@app.route("/aggregated/free")
+def aggregated_free_with_daily_granularity():
+    #both endpoint together
+    """
+    Usage: 
+        response = requests.get("http://localhost:5010/aggregated/hourly?start_date=2021-12-01&end_date=2021-12-31")
+        response.json()
+    """
+
+
+    start_date = request.args.get('start_date')
+    end_date = request.args.get('end_date')
+    json_object = getAggratedData_free(start_date, end_date)
 
 
     return jsonify(json_object)

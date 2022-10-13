@@ -1106,6 +1106,228 @@ def getAggratedData_Hourly(start_date, end_date):
         
     return aggreatedresults
 
+def getAggratedData_weekly(start_date, end_date):
+    json_object = get_DataByDay_AccumulatingWeek(start_date, end_date)
+
+
+    policy = generate_Standard_Policy()
+    results_policy = simulate_policy_JSON_format_week(policy, start_date, end_date)
+    """
+    {'Date': '2021-12-01',
+    'AccumulatedEnergyConsumption': 0.2891,
+    'AccumulatedCost': 10.720672,
+    'MaxEnergyCostInADay': 10.720672,
+    'MinEnergyCostInADay': 10.720672,
+    'AvgEnergyCostInADay': 10.720672,
+    'MaxEnergyConsumptionInADay': 0.2891,
+    'MinEnergyConsumptionInADay': 0.2891,
+    'AvgEnergyConsumptionInADay': 0.2891,
+    'AvgEnergyHourlyPrice': 0.4466946666666667,
+    'MaxEnergyHourlyPriceInAHour': 0.57096,
+    'MinEnergyHourlyPriceInAHour': 0.38576,
+    'ExternalTemperatureAvg': 4.942499999999999,
+    'MaxExternalTemperature': 8.83,
+    'MinExternalTemperature': 1.94}
+
+
+
+    {'Date': '2021-12-01',
+ 'AccumulatedCost': 11.185312,
+ 'AccumulatedEnergyConsumption': 45.600000000000016,
+ 'MaxEnergyCostInADay': 11.185312,
+ 'MinEnergyCostInADay': 0.69384,
+ 'AvgEnergyCostInADay': 6.034718999999999,
+ 'MaxEnergyConsumptionInADay': 45.600000000000016,
+ 'MinEnergyConsumptionInADay': 2.4,
+ 'AvgEnergyConsumptionInADay': 24.500000000000004,
+ 'AvgEnergyHourlyPrice': 0.24720958333333332,
+ 'MaxEnergyHourlyPriceInAHour': 0.2891,
+ 'MinEnergyHourlyPriceInAHour': 0.19281,
+ 'ExternalTemperatureAvg': 4.942499999999999,
+ 'MaxExternalTemperature': 8.83,
+ 'MinExternalTemperature': 1.94}
+    """
+
+
+    aggreatedresults =[]
+    for entry in range(len(json_object)):
+        Date = json_object[entry]['Date']
+        AccumulatedEnergyConsumption = json_object[entry]['AccumulatedEnergyConsumption']
+        AccumulatedCost = json_object[entry]['AccumulatedCost']
+        MaxEnergyCostInADay = json_object[entry]['MaxEnergyCostInADay']
+        MinEnergyCostInADay = json_object[entry]['MinEnergyCostInADay']
+        AvgEnergyCostInADay = json_object[entry]['AvgEnergyCostInADay']
+        MaxEnergyConsumptionInADay = json_object[entry]['MaxEnergyConsumptionInADay']
+        MinEnergyConsumptionInADay = json_object[entry]['MinEnergyConsumptionInADay']
+        AvgEnergyConsumptionInADay = json_object[entry]['AvgEnergyConsumptionInADay']
+        AvgEnergyHourlyPrice = json_object[entry]['AvgEnergyHourlyPrice']
+        MaxEnergyHourlyPriceInAHour = json_object[entry]['MaxEnergyHourlyPriceInAHour']
+        MinEnergyHourlyPriceInAHour = json_object[entry]['MinEnergyHourlyPriceInAHour']
+        ExternalTemperatureAvg = json_object[entry]['ExternalTemperatureAvg']
+        MaxExternalTemperature = json_object[entry]['MaxExternalTemperature']
+        MinExternalTemperature = json_object[entry]['MinExternalTemperature']
+
+        #policy
+        Standard_AccumulatedCost = results_policy[entry]['AccumulatedCost']
+        Standard_AccumulatedEnergyConsumption = results_policy[entry]['AccumulatedEnergyConsumption']
+        Standard_MaxEnergyCostInADay = results_policy[entry]['MaxEnergyCostInADay']
+        Standard_MinEnergyCostInADay = results_policy[entry]['MinEnergyCostInADay']
+        Standard_AvgEnergyCostInADay = results_policy[entry]['AvgEnergyCostInADay']
+        Standard_MaxEnergyConsumptionInADay = results_policy[entry]['MaxEnergyConsumptionInADay']
+        Standard_MinEnergyConsumptionInADay = results_policy[entry]['MinEnergyConsumptionInADay']
+        Standard_AvgEnergyConsumptionInADay = results_policy[entry]['AvgEnergyConsumptionInADay']
+        Standard_AvgEnergyHourlyPrice = results_policy[entry]['AvgEnergyHourlyPrice']
+        Standard_MaxEnergyHourlyPriceInAHour = results_policy[entry]['MaxEnergyHourlyPriceInAHour']
+        Standard_MinEnergyHourlyPriceInAHour = results_policy[entry]['MinEnergyHourlyPriceInAHour']
+        Standard_ExternalTemperatureAvg = results_policy[entry]['ExternalTemperatureAvg']
+        Standard_MaxExternalTemperature = results_policy[entry]['MaxExternalTemperature']
+        Standard_MinExternalTemperature = results_policy[entry]['MinExternalTemperature']
+
+
+
+        aggreatedresults.append({
+            'Date': Date,
+            'AccumulatedEnergyConsumption': AccumulatedEnergyConsumption,
+            'AccumulatedCost': AccumulatedCost,
+            'MaxEnergyCostInADay': MaxEnergyCostInADay,
+            'MinEnergyCostInADay': MinEnergyCostInADay,
+            'AvgEnergyCostInADay': AvgEnergyCostInADay,
+            'MaxEnergyConsumptionInADay': MaxEnergyConsumptionInADay,
+            'MinEnergyConsumptionInADay': MinEnergyConsumptionInADay,
+            'AvgEnergyConsumptionInADay': AvgEnergyConsumptionInADay,
+            'AvgEnergyHourlyPrice': AvgEnergyHourlyPrice,
+            'MaxEnergyHourlyPriceInAHour': MaxEnergyHourlyPriceInAHour,
+            'MinEnergyHourlyPriceInAHour': MinEnergyHourlyPriceInAHour,
+            'ExternalTemperatureAvg': ExternalTemperatureAvg,
+            'MaxExternalTemperature': MaxExternalTemperature,
+            'MinExternalTemperature': MinExternalTemperature,
+            'Standard_AccumulatedCost': Standard_AccumulatedCost,
+            'Standard_AccumulatedEnergyConsumption': Standard_AccumulatedEnergyConsumption,
+            'Standard_MaxEnergyCostInADay': Standard_MaxEnergyCostInADay,
+            'Standard_MinEnergyCostInADay': Standard_MinEnergyCostInADay,
+            'Standard_AvgEnergyCostInADay': Standard_AvgEnergyCostInADay,
+            'Standard_MaxEnergyConsumptionInADay': Standard_MaxEnergyConsumptionInADay,
+            'Standard_MinEnergyConsumptionInADay': Standard_MinEnergyConsumptionInADay,
+            'Standard_AvgEnergyConsumptionInADay': Standard_AvgEnergyConsumptionInADay,
+            'Standard_AvgEnergyHourlyPrice': Standard_AvgEnergyHourlyPrice,
+            'Standard_MaxEnergyHourlyPriceInAHour': Standard_MaxEnergyHourlyPriceInAHour,
+            'Standard_MinEnergyHourlyPriceInAHour': Standard_MinEnergyHourlyPriceInAHour,
+            'Standard_ExternalTemperatureAvg': Standard_ExternalTemperatureAvg,
+            'Standard_MaxExternalTemperature': Standard_MaxExternalTemperature,
+            'Standard_MinExternalTemperature': Standard_MinExternalTemperature
+            
+            })
+        
+    return aggreatedresults
+
+def getAggratedData_free(start_date, end_date):
+    json_object = get_DataByDay_accumulatePeriod(start_date, end_date)
+
+
+    policy = generate_Standard_Policy()
+    results_policy = simulate_policy_JSON_format_period(policy, start_date, end_date)
+    """
+    {'day': '2021-12-01',
+    'daily_energy_cost': 10.720672,
+    'daily_confort_score': 124,
+    'daily_energy_comsumption': 44.00000000000001,
+    'daily_temperature_avg': 4.942499999999999,
+    'daily_avg_energy_price': 0.24720958333333332,
+    'accumulated_cost_across_days': 10.720672,
+    'accumulated_comsumption_across_days': 44.00000000000001,
+    'accumulated_comfort_across_days': 124,
+    'max_energy_cost_hour': 0.57096,
+    'min_energy_cost_hour': 0.38576,
+    'max_energy_comsumption_hour': 2.4,
+    'min_energy_comsumption_hour': 1.6}
+
+
+
+    {'day': '2021-12-01',
+    'daily_energy_cost': 11.185312,
+    'daily_confort_score': 132,
+    'daily_energy_comsumption': 45.600000000000016,
+    'daily_temperature_avg': 4.942499999999999,
+    'daily_avg_energy_price': 0.24720958333333332,
+    'accumulated_cost_across_days': 11.185312,
+    'accumulated_comsumption_across_days': 45.600000000000016,
+    'accumulated_comfort_across_days': 132,
+    'max_energy_cost_hour': 11.185312,
+    'min_energy_cost_hour': 0.69384,
+    'max_energy_comsumption_hour': 45.600000000000016,
+    'min_energy_comsumption_hour': 2.4}
+        """
+
+
+    aggreatedresults =[]
+    for entry in range(len(json_object)):
+        day = json_object[entry]['day']
+        daily_energy_cost = json_object[entry]['daily_energy_cost']
+        daily_confort_score = json_object[entry]['daily_confort_score']
+        daily_energy_comsumption = json_object[entry]['daily_energy_comsumption']
+        daily_temperature_avg = json_object[entry]['daily_temperature_avg']
+        daily_avg_energy_price = json_object[entry]['daily_avg_energy_price']
+        accumulated_cost_across_days = results_policy[entry]['accumulated_cost_across_days']
+        accumulated_comsumption_across_days = results_policy[entry]['accumulated_comsumption_across_days']
+        accumulated_comfort_across_days = results_policy[entry]['accumulated_comfort_across_days']
+        max_energy_cost_hour = results_policy[entry]['max_energy_cost_hour']
+        min_energy_cost_hour = results_policy[entry]['min_energy_cost_hour']
+        max_energy_comsumption_hour = results_policy[entry]['max_energy_comsumption_hour']
+        min_energy_comsumption_hour = results_policy[entry]['min_energy_comsumption_hour']
+        
+        #policy
+        standard_daily_energy_cost = results_policy[entry]['daily_energy_cost']
+        standard_daily_confort_score = results_policy[entry]['daily_confort_score']
+        standard_daily_energy_comsumption = results_policy[entry]['daily_energy_comsumption']
+        standard_daily_temperature_avg = results_policy[entry]['daily_temperature_avg']
+        standard_daily_avg_energy_price = results_policy[entry]['daily_avg_energy_price']
+        standard_accumulated_cost_across_days = results_policy[entry]['accumulated_cost_across_days']
+        standard_accumulated_comsumption_across_days = results_policy[entry]['accumulated_comsumption_across_days']
+        standard_accumulated_comfort_across_days = results_policy[entry]['accumulated_comfort_across_days']
+        standard_max_energy_cost_hour = results_policy[entry]['max_energy_cost_hour']
+        standard_min_energy_cost_hour = results_policy[entry]['min_energy_cost_hour']
+        standard_max_energy_comsumption_hour = results_policy[entry]['max_energy_comsumption_hour']
+        standard_min_energy_comsumption_hour = results_policy[entry]['min_energy_comsumption_hour']
+
+
+
+
+
+        aggreatedresults.append({
+            "day": day,
+            "daily_energy_cost": daily_energy_cost,
+            "daily_confort_score": daily_confort_score,
+            "daily_energy_comsumption": daily_energy_comsumption,
+            "daily_temperature_avg": daily_temperature_avg,
+            "daily_avg_energy_price": daily_avg_energy_price,
+            "accumulated_cost_across_days": accumulated_cost_across_days,
+            "accumulated_comsumption_across_days": accumulated_comsumption_across_days,
+            "accumulated_comfort_across_days": accumulated_comfort_across_days,
+            "max_energy_cost_hour": max_energy_cost_hour,
+            "min_energy_cost_hour": min_energy_cost_hour,
+            "max_energy_comsumption_hour": max_energy_comsumption_hour,
+            "min_energy_comsumption_hour": min_energy_comsumption_hour,
+            "standard_daily_energy_cost": standard_daily_energy_cost,
+            "standard_daily_confort_score": standard_daily_confort_score,
+            "standard_daily_energy_comsumption": standard_daily_energy_comsumption,
+            "standard_daily_temperature_avg": standard_daily_temperature_avg,
+            "standard_daily_avg_energy_price": standard_daily_avg_energy_price,
+            "standard_accumulated_cost_across_days": standard_accumulated_cost_across_days,
+            "standard_accumulated_comsumption_across_days": standard_accumulated_comsumption_across_days,
+            "standard_accumulated_comfort_across_days": standard_accumulated_comfort_across_days,
+            "standard_max_energy_cost_hour": standard_max_energy_cost_hour,
+            "standard_min_energy_cost_hour": standard_min_energy_cost_hour,
+            "standard_max_energy_comsumption_hour": standard_max_energy_comsumption_hour,
+            "standard_min_energy_comsumption_hour": standard_min_energy_comsumption_hour
+            
+
+            })
+        
+    return aggreatedresults
+
+
+
+
 
 #main
 def main():
