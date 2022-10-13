@@ -2,7 +2,7 @@ from calendar import month
 from flask import Flask, jsonify, request
 from flask import url_for
 from flask_cors import CORS
-from hackaton import get_data_from_multiple_days, get_data_from_month, get_data_from_week, get_temperature_array, get_energy_array, calculateWeights, OptimizeCost, create_json_object, simulate_policy, simulate_policy_JSON_format, generate_Standard_Policy, get_DataByDay
+from hackaton import get_data_from_multiple_days, get_data_from_month, get_data_from_week, get_temperature_array, get_energy_array, calculateWeights, OptimizeCost, create_json_object, simulate_policy, simulate_policy_JSON_format, generate_Standard_Policy, get_DataByDay_accumulatePeriod, get_DataByDay_AccumulatingWeek
 from scipy.optimize import linprog
 
 
@@ -33,11 +33,11 @@ def optimizeDaily():
     return jsonify(json_object)
 
 
-@app.route("/optimizeDaily/daily")
+@app.route("/optimizeDaily/free")
 def optimizeDaily_daily_granularity():
     """
     Usage: 
-        response = requests.get("http://localhost:5000/optimizeDaily/daily?start_date=2021-12-01&end_date=2021-12-31")
+        response = requests.get("http://localhost:5000/optimizeDaily/free?start_date=2021-12-01&end_date=2021-12-31")
         response.json()
     """
     
@@ -45,7 +45,7 @@ def optimizeDaily_daily_granularity():
     start_date = request.args.get('start_date')
     end_date = request.args.get('end_date')
 
-    json_object = get_DataByDay(start_date, end_date)
+    json_object = get_DataByDay_accumulatePeriod(start_date, end_date)
     
     
     return jsonify(json_object)
@@ -55,15 +55,18 @@ def optimizeDaily_daily_granularity():
 def optimizeDaily_weekly_granularity():
     """
     Usage: 
-        response = requests.get("http://localhost:5000/optimizeDaily/weekly?year=2021&month=12")
+        response = requests.get("http://localhost:5010/optimizeDaily/weekly?year=2021&month=12")
         response.json()
     """
     
 
-    year = request.args.get('year')
-    month = request.args.get('month')
+    start_date = request.args.get('start_date')
+    end_date = request.args.get('end_date')
 
-    #json_object = get_DataByDay(start_date, end_date)
+    json_object = get_DataByDay_AccumulatingWeek(start_date, end_date)
+    
+    
+    return jsonify(json_object)
     
     
     return 

@@ -556,7 +556,7 @@ def get_data_from_multiple_days(start_date, end_date, confort_score_coef=0.00):
 
     return results
 
-def get_DataByDay(start_date, end_date, confort_score_coef=0.00):
+def get_DataByDay_accumulatePeriod(start_date, end_date, confort_score_coef=0.00):
     #receives a start date and end date and returns a list of dictionaries with the data for each day
     #the data is the same as the json object
 
@@ -614,6 +614,92 @@ def get_DataByDay(start_date, end_date, confort_score_coef=0.00):
 
         })
     
+    return json_object
+
+def get_DataByDay_AccumulatingWeek(start_date, end_date, confort_score_coef=0.00):
+    #get data from multiple days
+    #start_date and end_date must be in the format 'YYYY-MM-DD'
+    #confort_score_coef is the coeficient that multiplies the confort score
+    #returns a list with the results of the optimization for each day
+    results = get_data_from_multiple_days(start_date, end_date, confort_score_coef=confort_score_coef)
+    
+    #separate results by week depending on the start_date and end_date
+    #get the week number of the start_date
+    start_date_temp = datetime.strptime(start_date, '%Y-%m-%d')
+    start_week = start_date_temp.isocalendar()[1]
+    #get the week number of the end_date
+    end_date = datetime.strptime(end_date, '%Y-%m-%d')
+    end_week = end_date.isocalendar()[1]
+
+
+    #Add days from each week to a list
+    weeks = []
+    for week in range(start_week, end_week+1):
+        weeks.append([])
+        for i in range(7):
+            weeks[week-start_week].append(start_date_temp + timedelta(days=i))
+        start_date_temp = start_date_temp + timedelta(days=7)
+
+
+
+
+    start_date = datetime.strptime(start_date, '%Y-%m-%d')
+    #assume the first element of results is the start_date
+    #aggregate the results of the first week
+    json_object = []
+    for week in weeks:
+        
+        accumulated_energy_consumption = []
+        accumulated_cost = []
+        for i in range(len(results)):
+            current_day = start_date + timedelta(days=i)
+            #print(week)
+            #print(current_day)
+            if current_day in week:
+                #print("week", week)
+                print("oi")
+                energy_cost = results[i]['OptimizeCost'][1]
+                daily_energy_comsumption = results[i]['energy_array'][0]
+                temperatures= results[i]['OptimizeCost'][8]
+
+                energy_prices = results[i]['OptimizeCost'][4]
+
+                #accumlate the energy consumption and cost
+                accumulated_energy_consumption.append(daily_energy_comsumption)
+                accumulated_cost.append(energy_cost)
+                if len(accumulated_energy_consumption) > 1:
+                    accumulated_energy_consumption[-1]= accumulated_energy_consumption[-1] + accumulated_energy_consumption[-2]
+                
+                if len(accumulated_cost) > 1:
+                    accumulated_cost[-1]= accumulated_cost[-1] + accumulated_cost[-2]
+
+
+                accumulated_energy_consumption_day = accumulated_energy_consumption[-1]
+                accumulated_cost_day = accumulated_cost[-1]
+
+                json_object.append({
+                    'Date': current_day.strftime('%Y-%m-%d'),
+                    'AccumulatedEnergyConsumption': accumulated_energy_consumption_day,
+                    'AccumulatedCost': accumulated_cost_day,
+                    'MaxEnergyCostInADay': max(accumulated_cost),
+                    'MinEnergyCostInADay': min(accumulated_cost),
+                    'AvgEnergyCostInADay': sum(accumulated_cost)/len(accumulated_cost),
+                    'MaxEnergyConsumptionInADay': max(accumulated_energy_consumption),
+                    'MinEnergyConsumptionInADay': min(accumulated_energy_consumption),
+                    'AvgEnergyConsumptionInADay': sum(accumulated_energy_consumption)/len(accumulated_energy_consumption),
+                    'AvgEnergyHourlyPrice': sum(energy_prices)/len(energy_prices),
+                    'MaxEnergyHourlyPriceInAHour': max(energy_prices),
+                    'MinEnergyHourlyPriceInAHour': min(energy_prices),
+                    'ExternalTemperatureAvg': sum(temperatures)/len(temperatures),
+                    'MaxExternalTemperature': max(temperatures),
+                    'MinExternalTemperature': min(temperatures),
+                    
+
+                    
+
+                })
+            current_day = current_day + timedelta(days=1)
+                
     return json_object
 
 
