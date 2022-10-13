@@ -73,7 +73,7 @@ function App() {
                         onSetDate={setEndDate}
                     />
                 </div>
-                <div className="select-item-container">   
+                <div className="select-item-container multiple-select">   
                     <MultipleSelect
                         selectedList={charts}
                         setSelectedList={setCharts}
