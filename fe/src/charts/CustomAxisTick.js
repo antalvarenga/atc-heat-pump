@@ -1,6 +1,7 @@
 const CustomAxisTick = (props) => {
     const { x, y, stroke, payload } = props;
-
+    console.log("payload", payload)
+    console.log("customText", props.customText)
     return (
         <g transform={`translate(${x},${y})`}>
             <text
@@ -9,9 +10,10 @@ const CustomAxisTick = (props) => {
                 dy={16}
                 textAnchor="end"
                 fill="#666"
-                transform="rotate(-35)"
+                {...(props.isSingleDay ? {} : {transform: "rotate(-35)"})}
             >
-                {payload.value}
+
+                {payload.value}{props.isSingleDay ? "h" : ""}
             </text>
         </g>
     );

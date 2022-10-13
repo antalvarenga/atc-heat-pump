@@ -5,7 +5,6 @@ import CustomTooltip from './CustomTooltip';
 import CustomAxisTick from './CustomAxisTick';
 
 const formatter = (value, name, props) => {
-    console.log("name", name)
     let formattedName;
     let formattedValue;
     switch (name){
@@ -25,8 +24,6 @@ const formatter = (value, name, props) => {
         formattedName = name
         formattedValue = value
     }
-    console.log("formattedName", formattedName)
-    console.log("formattedValue", formattedValue)
     return [formattedValue, formattedName]
   }
 
@@ -39,7 +36,7 @@ const DefaultAreaChart = (props) => {
                 <stop offset="95%" stopColor={colors.green} stopOpacity={0}/>
                 </linearGradient>
             </defs>
-            <XAxis dataKey={props.xaxis} tick={<CustomAxisTick />}/>
+            <XAxis interval="preserveStartEnd" dataKey={props.isSingleDay ? "hour" : "day"} tick={<CustomAxisTick isSingleDay={props.isSingleDay}/>}/>
             <YAxis />
             <CartesianGrid strokeDasharray="3 3" />
             <Tooltip content={<CustomTooltip formatter={formatter}/>} />

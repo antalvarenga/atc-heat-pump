@@ -1,11 +1,13 @@
 from calendar import month
 from flask import Flask, jsonify, request
 from flask import url_for
+from flask_cors import CORS
 from hackaton import get_data_from_multiple_days, get_data_from_month, get_data_from_week, get_temperature_array, get_energy_array, calculateWeights, OptimizeCost, create_json_object, simulate_policy, simulate_policy_JSON_format, generate_Standard_Policy, get_DataByDay
 from scipy.optimize import linprog
 
 
 app = Flask(__name__)
+cors = CORS(app, origins=["http://localhost:3000"])
 
 @app.route('/')
 def index():

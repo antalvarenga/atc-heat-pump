@@ -31,7 +31,7 @@ const ModeLineChart = (props) => {
                 stroke={colors.green}
             />
             <CartesianGrid stroke="#ccc" strokeDasharray="5 5" />
-            <XAxis dataKey="day" tick={<CustomAxisTick />}/>
+            <XAxis interval="preserveStartEnd" dataKey={props.isSingleDay ? "hour" : "day"} tick={<CustomAxisTick isSingleDay={props.isSingleDay}/>}/>
             <YAxis dataKey="mode" tickCount={3} tickFormatter={formatYAxis}/>
             <Tooltip content={<CustomTooltip formatter={formatter}/>} />
         </LineChart>
