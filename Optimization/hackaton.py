@@ -319,9 +319,6 @@ def printResults(results):
         print("Accumulated Consumption: ", results[i]['OptimizeCost'][7])
         print("")
 
-    
-
-
 def get_temperature_array_from_api(start_date, end_date=None):
     if end_date == None:
         response = requests.get("http://localhost:5002/?start_date="+start_date+"&end_date="+start_date)
@@ -536,7 +533,8 @@ def simulate_policy_JSON_format_hourly(policy, date):
                     'Comfort_score_for_that_complete_day': accumulated_comfort[-1],
                     'Accumulated_daily_comfort_score_until_that_hour': accumulated_comfort[i],
                     'exterior_temperature': temperature_array[i],
-                    'energy_price': energy_cost_array[i]
+                    'energy_price': energy_cost_array[i],
+
                 })
             
 
@@ -1027,6 +1025,88 @@ def simulate_policy_JSON_format_week(policy, start_date, end_date):
                 
 
     return json_object
+
+
+
+def getAggratedData_Hourly(start_date, end_date):
+    start = datetime.strptime(start_date, '%Y-%m-%d')
+    end = datetime.strptime(end_date, '%Y-%m-%d')
+    #print(start)
+    #print(end)
+    step = timedelta(days=1)
+
+    results = []
+
+    policy = generate_Standard_Policy()
+    while start <= end:
+        results.append(simulate_policy_JSON_format_hourly(policy, start.strftime('%Y-%m-%d')))
+        start += step
+
+
+
+    results_algorithm = get_data_from_multiple_days(start_date, end_date)
+    json_object = create_json_object(results_algorithm, start_date)
+
+
+    #concat element wise the results and the json_object 
+    #reshape results to be a 1D array
+    results_policy = np.concatenate(results)
+    results_policy = results_policy.reshape(-1)
+    len(results_policy)
+
+    aggreatedresults =[]
+    for entry in range(len(json_object)):
+        hour = json_object[entry]['hour']
+        mode = json_object[entry]['mode']
+        day = json_object[entry]['day']
+        Energy_cost_for_that_complete_day = json_object[entry]['Energy_cost_for_that_complete_day']
+        accumulated_energy_cost_that_hour = json_object[entry]['accumulated_energy_cost_that_hour']
+        Energy_cost_for_that_hour = json_object[entry]['Energy_cost_for_that_hour']
+        Accumulated_daily_energy_cost_until_that_hour = json_object[entry]['Accumulated_daily_energy_cost_until_that_hour']
+        Consumption_for_that_hour = json_object[entry]['Consumption_for_that_hour']
+        Accumulated_daily_consumption_until_that_hour = json_object[entry]['Accumulated_daily_consumption_until_that_hour']
+        Comfort_score_for_that_complete_day = json_object[entry]['Comfort_score_for_that_complete_day']
+        Accumulated_daily_comfort_score_until_that_hour = json_object[entry]['Accumulated_daily_comfort_score_until_that_hour']
+        exterior_temperature = json_object[entry]['exterior_temperature']
+        energy_price  = json_object[entry]['energy_price']
+
+
+        Standard_Mode = results_policy[entry]['mode']
+        Standard_Energy_cost_for_that_complete_day = results_policy[entry]['Energy_cost_for_that_complete_day']
+        Standard_accumulated_energy_cost_that_hour = results_policy[entry]['accumulated_energy_cost_that_hour']
+        Standard_Energy_cost_for_that_hour = results_policy[entry]['Energy_cost_for_that_hour']
+        Standard_Accumulated_daily_comfort_score_until_that_hour = results_policy[entry]['Accumulated_daily_comfort_score_until_that_hour']
+        Standard_Consumption_for_that_hour = results_policy[entry]['Consumption_for_that_hour']
+        Standard_Accumulated_daily_consumption_until_that_hour = results_policy[entry]['Accumulated_daily_consumption_until_that_hour']
+        Standard_Comfort_score_for_that_complete_day = results_policy[entry]['Comfort_score_for_that_complete_day']
+
+        aggreatedresults.append({
+                "hour": hour,
+                "mode": mode,
+                "day": day,
+                "Energy_cost_for_that_complete_day": Energy_cost_for_that_complete_day,
+                "accumulated_energy_cost_that_hour": accumulated_energy_cost_that_hour,
+                "Energy_cost_for_that_hour": Energy_cost_for_that_hour,
+                "Accumulated_daily_energy_cost_until_that_hour": Accumulated_daily_energy_cost_until_that_hour,
+                "Consumption_for_that_hour": Consumption_for_that_hour,
+                "Accumulated_daily_consumption_until_that_hour": Accumulated_daily_consumption_until_that_hour,
+                "Comfort_score_for_that_complete_day": Comfort_score_for_that_complete_day,
+                "Accumulated_daily_comfort_score_until_that_hour": Accumulated_daily_comfort_score_until_that_hour,
+                "exterior_temperature": exterior_temperature,
+                "energy_price": energy_price,
+                "Standard_Mode": Standard_Mode,
+                "Standard_Energy_cost_for_that_complete_day": Standard_Energy_cost_for_that_complete_day,
+                "Standard_Accumulated_daily_energy_cost_until_that_hour": Standard_accumulated_energy_cost_that_hour,
+                "Standard_Energy_cost_for_that_hour": Standard_Energy_cost_for_that_hour,
+                "Standard_Consumption_for_that_hour": Standard_Consumption_for_that_hour,
+                "Standard_Accumulated_daily_consumption_until_that_hour": Standard_Accumulated_daily_consumption_until_that_hour,
+                "Standard_Comfort_score_for_that_complete_day": Standard_Comfort_score_for_that_complete_day,
+                "Standard_Accumulated_daily_comfort_score_until_that_hour": Standard_Accumulated_daily_comfort_score_until_that_hour
+            })
+        
+    return aggreatedresults
+
+
 #main
 def main():
     start_date='2021-12-01'
