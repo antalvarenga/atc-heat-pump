@@ -321,13 +321,15 @@ def printResults(results):
 
     
 
-def get_temperature_array_from_api(start_date):
-    response = requests.get("http://localhost:5002/?start_date="+start_date+"&end_date="+start_date)
+
+def get_temperature_array_from_api(start_date, end_date=None):
+    response = requests.get("http://localhost:5002/?start_date="+start_date+"&end_date="+end_date or start_date)
     temperature_array=[]
     for i in range(len(response.json())):
         temperature_array.append(response.json()[i]['temperature'])
     
     return temperature_array[0]
+
 
 
 def get_energy_array_from_api(start_date, end_date):
