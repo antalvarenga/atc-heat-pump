@@ -2,7 +2,7 @@ from itertools import accumulate
 from scipy.optimize import linprog
 import numpy as np
 import math
-from electricity_prices import read_prices
+from ExternalAPI.electricity_prices import read_prices
 from datetime import datetime, timedelta
 import json
 import pandas as pd
@@ -321,8 +321,8 @@ def printResults(results):
 
     
 
-def get_temperature_array_from_api(start_date):
-    response = requests.get("http://localhost:5002/?start_date="+start_date+"&end_date="+start_date)
+def get_temperature_array_from_api(start_date, end_date=None):
+    response = requests.get("http://localhost:5002/?start_date="+start_date+"&end_date="+end_date or start_date)
     temperature_array=[]
     for i in range(len(response.json())):
         temperature_array.append(response.json()[i]['temperature'])
@@ -543,7 +543,7 @@ def get_data_from_multiple_days(start_date, end_date, confort_score_coef=0.00):
     for i in range((end_date-start_date).days+1):
         date = start_date + pd.Timedelta(days=i)
         #temperature_array = get_temperature_array(date)
-        temperature_array= get_temperature_array_from_api(date.strftime('%Y-%m-%d'))
+        temperature_array = get_temperature_array_from_api(date.strftime('%Y-%m-%d'))
         #energy_array = get_energy_array(date)
         energy_array = energy_arrays[i]
 

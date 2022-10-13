@@ -1,11 +1,11 @@
 from flask import Flask, jsonify, request
 from flask import url_for
-from electricity_prices import read_prices
 from datetime import datetime
 import json
 import pandas as pd
 import numpy as np
-from temperatures_values import get_temperature_array_JSON_Format
+from .temperatures_values import get_temperature_array_JSON_Format
+from .electricity_prices import read_prices
 
 app = Flask(__name__)
 

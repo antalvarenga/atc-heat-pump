@@ -3,6 +3,7 @@ from flask import Flask, jsonify, request
 from flask import url_for
 from flask_cors import CORS
 from hackaton import get_data_from_multiple_days, get_data_from_month, get_data_from_week, get_temperature_array, get_energy_array, calculateWeights, OptimizeCost, create_json_object, simulate_policy, simulate_policy_JSON_format, generate_Standard_Policy, get_DataByDay
+from thermal_model import get_thermal_model_DataByDay
 from scipy.optimize import linprog
 
 
@@ -105,3 +106,21 @@ def standardPolicy():
 with app.test_request_context():
     print(url_for('index'))
 
+
+@app.route("/continuousModel")
+def continuous_model():
+    """
+    Usage: 
+        response = requests.get("http://localhost:5000/continuousModel?start_date=2021-12-01&end_date=2021-12-31&storage=True&flexible=True")
+        response.json()
+    """
+    
+
+    start_date = request.args.get('start_date')
+    end_date = request.args.get('end_date')
+    storage = request.args.get('storage') == "True"
+    flexible = request.args.get('flexible') == "True"
+
+    json_object = get_thermal_model_DataByDay(start_date, end_date, storage, flexible)
+    
+    return jsonify(json_object)

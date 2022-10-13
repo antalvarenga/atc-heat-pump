@@ -9,7 +9,7 @@ def read_prices(t0: datetime, t1: datetime):
     t = t0
     delta = timedelta(days=1)
 
-    folder_name = '../data/marginalpdbcpt_2021/'
+    folder_name = './data/marginalpdbcpt_2021/'
 
     file_index = dict()
     for fname in os.listdir(folder_name):
