@@ -73,12 +73,12 @@ def simulate(prices, out_temps, modes, storage=True):
 
     return {
         "room_temps": room_temps,
-        "costs": costs,
+        "Energy_cost_for_that_hour": costs,
         "power_modes": power_modes,
         "storage_modes": storage_modes,
         "reservoir_energy": reservoir_energy,
-        "power_transfered": power_transfered,
-        "power_input": power_input,
+        "Consumption_for_that_hour": power_transfered,
+        "mode": power_input,
         "power_stored": power_stored,
     }
 
@@ -133,7 +133,7 @@ def print_results(solution, prices, out_temps, not_home_hours, sleep_hours, stor
 
     plt.plot(results["power_input"], label="Heating Power [kW]")
     if storage:
-        plt.plot(results["power_transfered"], label="Power Demanded [kW]")
+        plt.plot(results["consumption"], label="Power Demanded [kW]")
         plt.plot(results["power_stored"], label="Power Stored [kW]")
         plt.plot(results["reservoir_energy"], label="Stored Energy [kWh]")
     plt.plot(prices, label="Electricty Price [€/kWh]")
@@ -169,14 +169,14 @@ def get_thermal_model_DataByDay(start_date, end_date, storage, flexible):
         def objective(modes):
             results = simulate(prices, out_temps, modes.tolist())
             temperature_deviations_cost, _ = temperature_contraints(results["room_temps"], not_home_hours, sleep_hours, low_deviation_cost, high_deviation_cost)
-            return sum(results["costs"]) + temperature_deviations_cost
+            return sum(results["Energy_cost_for_that_hour"]) + temperature_deviations_cost
 
         solution = minimize(objective, tuple(init_modes), options={"maxiter": 1e8}).x.tolist()
     else:
         def objective(modes):
             results = simulate(prices, out_temps, modes.tolist(), storage=False)
             temperature_deviations_cost, _ = temperature_contraints(results["room_temps"], not_home_hours, sleep_hours, low_deviation_cost, high_deviation_cost)
-            return sum(results["costs"]) + temperature_deviations_cost
+            return sum(results["Energy_cost_for_that_hour"]) + temperature_deviations_cost
 
         solution = minimize(objective, tuple(init_power_modes), options={"maxiter": 1e8}).x.tolist()
        
@@ -184,7 +184,10 @@ def get_thermal_model_DataByDay(start_date, end_date, storage, flexible):
     _, min_temps = temperature_contraints(results["room_temps"], not_home_hours, sleep_hours)
 
     results["min_temps"] = min_temps
-    results["accumulated_costs"] = np.cumsum(np.array(results["costs"]))
+    results["Accumulated_daily_energy_cost_until_that_hour"] = np.cumsum(np.array(results["Energy_cost_for_that_hour"]))
+    results["Accumulated_daily_comsumption_cost_until_that_hour"] = np.cumsum(np.array(results["Consumption_for_that_hour"]))
+
+    #results["Accumulated_daily_consumption_until_that_hour"] = np.cumsum(np.array(results["consumption"]))
 
     results["day"] = [start_date] * 24
     results["hour"] = list(range(24))
@@ -194,8 +197,11 @@ def get_thermal_model_DataByDay(start_date, end_date, storage, flexible):
         date += timedelta(days=1)
         results["day"] += [date.strftime("%Y-%m-%d")] * 24
         results["day"] += list(range(24))
+    
+
 
     return [dict(zip(results.keys(), t)) for t in zip(*results.values())]  # Convert Dict of Lists into List of Dicts
+
 
 
 if __name__ == "__main__":

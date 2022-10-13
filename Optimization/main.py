@@ -145,7 +145,7 @@ with app.test_request_context():
 
 
 
-@app.route("/continuousModel")
+@app.route("/continuousModel/hourly")
 def continuous_model():
     """
     Usage: 

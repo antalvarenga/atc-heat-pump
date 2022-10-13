@@ -282,7 +282,7 @@ def create_json_object(results, start_date):
                 'Energy_cost_for_that_complete_day': Energy_cost_for_that_complete_day,
                 'accumulated_energy_cost_that_hour': accumulated_energy_cost_that_hour,
                 'Energy_cost_for_that_hour': Energy_cost_for_that_hour,
-                'Accumulated_daily_comfort_score_until_that_hour': Accumulated_daily_energy_cost_until_that_hour,
+                'Accumulated_daily_energy_cost_until_that_hour': Accumulated_daily_energy_cost_until_that_hour,
                 'Consumption_for_that_hour': Consumption_for_that_hour,
                 'Accumulated_daily_consumption_until_that_hour': Accumulated_daily_consumption_until_that_hour,
                 'Comfort_score_for_that_complete_day': Comfort_score_for_that_complete_day,
@@ -323,7 +323,10 @@ def printResults(results):
 
 
 def get_temperature_array_from_api(start_date, end_date=None):
-    response = requests.get("http://localhost:5002/?start_date="+start_date+"&end_date="+end_date or start_date)
+    if end_date == None:
+        response = requests.get("http://localhost:5002/?start_date="+start_date+"&end_date="+start_date)
+    else:
+        response = requests.get("http://localhost:5002/?start_date="+start_date+"&end_date="+end_date)
     temperature_array=[]
     for i in range(len(response.json())):
         temperature_array.append(response.json()[i]['temperature'])
@@ -624,6 +627,7 @@ def get_DataByDay_accumulatePeriod(start_date, end_date, confort_score_coef=0.00
 
         })
     
+    
     return json_object
 
 def get_DataByDay_AccumulatingWeek(start_date, end_date, confort_score_coef=0.00):
@@ -667,7 +671,6 @@ def get_DataByDay_AccumulatingWeek(start_date, end_date, confort_score_coef=0.00
             #print(current_day)
             if current_day in week:
                 #print("week", week)
-                print("oi")
                 energy_cost = results[i]['OptimizeCost'][1]
                 daily_energy_comsumption = results[i]['energy_array'][0]
                 temperatures= results[i]['OptimizeCost'][8]
