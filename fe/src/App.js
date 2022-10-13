@@ -11,8 +11,8 @@ import MultipleSelect from "./ui/MultipleSelect";
 
 const cardStyles = {
     sx: {
-        margin: "40px 0",
-        padding: "40px",
+        margin: "20px 0",
+        padding: "30px",
     },
 };
 
@@ -57,25 +57,32 @@ function App() {
                     dezembro de 2021.
                 </p>
             </div>
-            <div style={{ textAlign: "left" }}>
-                <BasicDatePicker
+            <div style={{ display: "flex", flexDirection: "row", alignItems: "center", justifyContent:"flex-start" }}>
+                <div className="select-item-container">   
+                    <BasicDatePicker
                     label="Data inicial"
                     initialValue={startDate}
                     onSetDate={setStartDate}
-                />
-                <BasicDatePicker
-                    label="Data final"
-                    initialValue={endDate}
-                    onSetDate={setEndDate}
-                />
-                <MultipleSelect
-                    selectedList={charts}
-                    setSelectedList={setCharts}
-                    list={initialCharts}
-                />
+                     />
+                </div>
+
+                <div className="select-item-container">   
+                    <BasicDatePicker
+                        label="Data final"
+                        initialValue={endDate}
+                        onSetDate={setEndDate}
+                    />
+                </div>
+                <div className="select-item-container multiple-select">   
+                    <MultipleSelect
+                        selectedList={charts}
+                        setSelectedList={setCharts}
+                        list={initialCharts}
+                    />
+                </div>
             </div>
             {data && (
-                <>
+                <div>
                     {charts.includes("Modo de Funcionamento") && (
                         <Card {...cardStyles}>
                             <h2>Modo de Funcionamento</h2>
@@ -140,7 +147,7 @@ function App() {
                             />
                         </Card>
                     )}
-                </>
+                </div>
             )}
         </div>
     );

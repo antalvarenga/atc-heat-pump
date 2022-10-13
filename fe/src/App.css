@@ -38,3 +38,18 @@
     transform: rotate(360deg);
   }
 }
+
+.select-item-container {
+  margin: 0 5px 0 5px ;
+}
+
+.select-item-container:first-child {
+  margin-left:0; 
+}
+.select-item-container:last-child {
+   margin-right:0; 
+}
+
+.multiple-select .MuiFormControl-root{
+  margin:0 !important;
+}

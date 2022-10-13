@@ -43,7 +43,7 @@ export default function MultipleSelect(props) {
 
   return (
     <div>
-      <FormControl sx={{ m: 1, width: 300 }}>
+      <FormControl sx={{ m: 1, width: 600 }}>
         <InputLabel id="demo-multiple-name-label">Gráficos </InputLabel>
         <Select
           labelId="demo-multiple-name-label"
