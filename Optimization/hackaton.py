@@ -1122,7 +1122,7 @@ def getAggratedData_Hourly(start_date, end_date):
                 "Energy_cost_for_that_complete_day": Energy_cost_for_that_complete_day,
                 "AccumulatedCost": accumulated_energy_cost_that_hour,
                 "Energy_cost_for_that_hour": Energy_cost_for_that_hour,
-                "EnergyComsumption": Consumption_for_that_hour,
+                "EnergyConsumption": Consumption_for_that_hour,
                 "AccumulatedEnergyConsumption": Accumulated_daily_consumption_until_that_hour,
                 "ComfortScore": Comfort_score_for_that_complete_day,
                 "AccumulatedComfortScore": Accumulated_daily_comfort_score_until_that_hour,
