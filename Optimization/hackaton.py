@@ -1071,7 +1071,6 @@ def getAggratedData_Hourly(start_date, end_date):
     step = timedelta(days=1)
 
     results = []
-
     policy = generate_Standard_Policy()
     while start <= end:
         results.append(simulate_policy_JSON_format_hourly(policy, start.strftime('%Y-%m-%d')))
@@ -1113,7 +1112,10 @@ def getAggratedData_Hourly(start_date, end_date):
         Standard_Consumption_for_that_hour = results_policy[entry]['Consumption_for_that_hour']
         Standard_Accumulated_daily_consumption_until_that_hour = results_policy[entry]['Accumulated_daily_consumption_until_that_hour']
         Standard_Comfort_score_for_that_complete_day = results_policy[entry]['Comfort_score_for_that_complete_day']
-        Standard_AccumulatedEnergyConsumption = results_policy[entry]['accumulated_energy_cost_that_hour']
+        
+        Standard_AccumulatedEnergyConsumption = results_policy[entry]['Accumulated_daily_consumption_until_that_hour']
+
+
 
         aggreatedresults.append({
                 "hour": hour,
@@ -1135,7 +1137,7 @@ def getAggratedData_Hourly(start_date, end_date):
 
                 #cost per hour
                 "Standard_AvgEnergyCostInADay": Standard_Energy_cost_for_that_complete_day,
-                "Standard_Accumulated_daily_energy_cost_until_that_hour": Standard_accumulated_energy_cost_that_hour,
+                "Standard_AccumulatedCost": Standard_accumulated_energy_cost_that_hour,
                 "Standard_AvgEnergyCostInADay": Standard_Energy_cost_for_that_hour,
                 "Standard_EnergyConsumption": Standard_Consumption_for_that_hour,
                 "Standard_AvgEnergyConsumptionInADay": Standard_Accumulated_daily_consumption_until_that_hour,
