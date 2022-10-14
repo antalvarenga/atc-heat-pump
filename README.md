@@ -16,17 +16,42 @@ For backend:
 
 - Install python 3.9 using https://www.python.org/downloads/
 
-- Install poetry (dependency manager): ```pip install poetry```
+- Install poetry (dependency manager):
 
-- Install dependencies: ```poetry install```
+    ```pip install poetry```
 
-- Run backend: ```poetry run flask --app main run --port=5010```
+- Install dependencies: 
+
+    ```cd Optimization/```
+
+    ```poetry install```
+
+- Run backend:
+
+    ```poetry run flask --app main run --port=5010```
 
 - Run APIs:
 
-    ```cd Optimization/ExternalAPI/```
+    ```cd ExternalAPI/```
 
     ```poetry run flask --app api_electricity run --port=5001```
 
     ```poetry run flask --app api_temperature_Braganca run --port=5002```
+
+
+# Repository Structure
+
+- fe - Frontend code
+
+- Optimization - Backend code:
+
+    - ExternalAPI: Temperature and Price APIs
+
+    - main.py - Backend API
+
+    - hackathon.py - Base model optimization code
+
+    - thermal_model.py - Continuous model optimization code
+
+  
 

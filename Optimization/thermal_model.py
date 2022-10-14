@@ -10,12 +10,16 @@ from ExternalAPI.electricity_prices import read_prices
 
 def simulate(prices, out_temps, modes, storage=True):
 
+    # Extract power and storage commands
+
     if storage:
         power_modes = modes[:int(len(modes)/2)]
         storage_modes = modes[int(len(modes)/2):]
     else:
         power_modes = modes
         storage_modes = [0] * len(modes)
+
+    # Initialize parameters
 
     heat_capacity_room = 1000
     heat_loss_coef = 200
@@ -40,8 +44,12 @@ def simulate(prices, out_temps, modes, storage=True):
     power_input = []
     power_stored = []
 
+
+    # Iterate over time
+
     for price, out_temp, power_mode, storage_mode in zip(prices, out_temps, power_modes, storage_modes):
 
+        # Heat losses through walls/windows
         heat_loss = heat_loss_coef * (room_temp - out_temp)
 
         # Calculate power stored without passing the reservoir limits
@@ -50,7 +58,10 @@ def simulate(prices, out_temps, modes, storage=True):
         current_reservoir_energy = max(min(prev_reservoir_energy + power_stored_aux, reservoir_capacity), 0)  # Within capacity
         current_power_stored = current_reservoir_energy - prev_reservoir_energy
 
+        # Calculate heat pump power
         current_power_input = max(power_mode * base_power, min_heater_power)
+
+        # Calculate power extracted from grid
         current_power_transfered = current_power_input + current_power_stored
 
         # 2 Equations on 2 variables:
@@ -60,12 +71,13 @@ def simulate(prices, out_temps, modes, storage=True):
         # With some manipulation:
         heat_pumped = current_power_input * (COP_at_45 - COP_coef * (room_temp - out_temp - 45)) / (1 + current_power_input * COP_coef / heat_transfer_coef)
         
+        # Update room temperature
         room_temp -= heat_loss / heat_capacity_room
         room_temp += heat_pumped / heat_capacity_room
 
+        # Save results
         room_temps.append(room_temp)
         costs.append(price * current_power_transfered / 1000)
-
         reservoir_energy.append(current_reservoir_energy / 1000)
         power_transfered.append(current_power_transfered / 1000)
         power_input.append(current_power_input / 1000)
@@ -91,10 +103,13 @@ def temperature_contraints(
     high_deviation_cost = 1,
 ):
 
+    # Define target temperatures
+
     not_home_min_temperature = 18
     sleep_min_temperature = 22
     at_home_min_temperature = 25
 
+    # Calculate cost of deviating from target temperatures
     loss = 0
     min_temps = []
     for rt, nh, s in zip(room_temps, not_home_hours, sleep_hours):
@@ -145,6 +160,8 @@ def print_results(solution, prices, out_temps, not_home_hours, sleep_hours, stor
 
 
 def get_thermal_model_DataByDay(start_date, end_date, storage, flexible):
+
+    # Optimize and format results for API
 
     prices = np.concatenate(get_energy_array_from_api(start_date, end_date)).tolist()
     out_temps =  get_temperature_array_from_api(start_date, end_date)
@@ -198,8 +215,6 @@ def get_thermal_model_DataByDay(start_date, end_date, storage, flexible):
         results["day"] += [date.strftime("%Y-%m-%d")] * 24
         results["day"] += list(range(24))
     
-
-
     return [dict(zip(results.keys(), t)) for t in zip(*results.values())]  # Convert Dict of Lists into List of Dicts
 
 
