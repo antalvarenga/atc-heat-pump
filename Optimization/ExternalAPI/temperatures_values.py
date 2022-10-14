@@ -5,7 +5,7 @@ import numpy as np
 
 
 def get_temperature_array_JSON_Format(start_date, end_date):
-    with open('../data/temp_data.json') as json_file:
+    with open('./data/temp_data.json') as json_file:
         data = json.load(json_file)
     df = pd.DataFrame(data)
     df['dt'] = pd.to_datetime(df['dt'], unit='s')
@@ -32,4 +32,3 @@ def get_temperature_array_JSON_Format(start_date, end_date):
 
 
     return json_object
-

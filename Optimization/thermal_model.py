@@ -6,6 +6,15 @@ import numpy as np
 
 from hackaton import get_energy_array_from_api, get_temperature_array_from_api
 from ExternalAPI.electricity_prices import read_prices
+from ExternalAPI.temperatures_values import get_temperature_array_JSON_Format
+
+
+def get_temperatures(start_date, end_date):
+    temperature_array = get_temperature_array_JSON_Format(start_date, end_date)
+    temps = []
+    for day_temps in temperature_array:
+        temps += day_temps["temperature"]
+    return temps
 
 
 def simulate(prices, out_temps, modes, storage=True):
@@ -28,7 +37,7 @@ def simulate(prices, out_temps, modes, storage=True):
     heat_transfer_coef = 200
     reservoir_capacity = 5000
 
-    room_temp = 15
+    room_temp = 20
     current_reservoir_energy = 0
     max_reservoir_charge_rate = 1000
     max_reservoir_discharge_rate = 1000
@@ -142,19 +151,25 @@ def print_results(solution, prices, out_temps, not_home_hours, sleep_hours, stor
     plt.plot(out_temps, label="Outside Temperature [ºC]")
     plt.plot(results["room_temps"], label="Room Temperature [ºC]")
     plt.plot(min_temps, label="Target Temperature [ºC]")
+    plt.xlabel("Time [hours]")
     plt.legend()
     plt.grid()
     plt.show()
 
-    plt.plot(results["power_input"], label="Heating Power [kW]")
-    if storage:
-        plt.plot(results["consumption"], label="Power Demanded [kW]")
-        plt.plot(results["power_stored"], label="Power Stored [kW]")
-        plt.plot(results["reservoir_energy"], label="Stored Energy [kWh]")
+    plt.plot(results["Consumption_for_that_hour"], label="Power Demanded [kW]")
     plt.plot(prices, label="Electricty Price [€/kWh]")
+    plt.xlabel("Time [hours]")
     plt.legend()
     plt.grid()
-    plt.show() 
+    plt.show()
+
+    if storage:
+        plt.plot(results["power_stored"], label="Power Stored [kW]")
+        plt.plot(prices, label="Electricty Price [€/kWh]")
+        plt.xlabel("Time [hours]")
+        plt.legend()
+        plt.grid()
+        plt.show() 
 
     return results
 
@@ -221,20 +236,58 @@ def get_thermal_model_DataByDay(start_date, end_date, storage, flexible):
 
 if __name__ == "__main__":
 
-    num_days = 3
+    # Select days
+
+    num_days = 7
 
     t0 = datetime.fromisoformat('2021-12-03')
-    t1 = t0 + timedelta(days=num_days)
+    t1 = t0 + timedelta(days=num_days-1)
+
+    # Gets prices and temperatures
 
     prices = np.concatenate(read_prices(t0, t1))[:24 * num_days].tolist()
-    out_temps = (10 - 5 * np.sin(np.arange(24 * num_days) * 2 * np.pi / 24)).tolist()
+    out_temps = get_temperatures(datetime.strftime(t0, '%Y-%m-%d'), datetime.strftime(t1, '%Y-%m-%d'))
 
-    init_power_modes = ([1] * 24) * num_days
+    # Initializes power and storage inputs
+
+    init_power_modes = ([1.1] * 24) * num_days
     init_storage_modes = ([0.2] * 12 + [-0.2] * 12) * num_days
     init_modes = init_power_modes + init_storage_modes
 
+    # Define not_home and sleep hours
+
     not_home_hours = ([0] * 9 + [1] * 10 + [0] * 5) * num_days
     sleep_hours = ([1] * 7 + [0] * 17) * num_days
+
+
+    # ------ Experiments --------
+
+
+    # Fixed power schedule
+
+    naive_costs = print_results(init_power_modes, prices, out_temps, not_home_hours, sleep_hours, storage=False)["Energy_cost_for_that_hour"]
+
+
+    # Without Storage
+
+    def objective(modes):
+        results = simulate(prices, out_temps, modes.tolist(), storage=False)
+        temperature_deviations_cost, _ = temperature_contraints(results["room_temps"], not_home_hours, sleep_hours)
+        return sum(results["Energy_cost_for_that_hour"]) + temperature_deviations_cost
+
+    solution = minimize(objective, tuple(init_power_modes), options={"maxiter": 1e8}).x.tolist()
+    optimized_costs = print_results(solution, prices, out_temps, not_home_hours, sleep_hours, storage=False)["Energy_cost_for_that_hour"]
+
+
+    # With Storage
+
+    def objective(modes):
+        results = simulate(prices, out_temps, modes.tolist())
+        temperature_deviations_cost, _ = temperature_contraints(results["room_temps"], not_home_hours, sleep_hours)
+        return sum(results["Energy_cost_for_that_hour"]) + temperature_deviations_cost
+
+    solution = minimize(objective, tuple(init_modes), options={"maxiter": 1e8}).x.tolist()
+    storage_optimized_costs = print_results(solution, prices, out_temps, not_home_hours, sleep_hours)["Energy_cost_for_that_hour"]
 
 
     # With Storage + Flexible
@@ -245,45 +298,19 @@ if __name__ == "__main__":
     def objective(modes):
         results = simulate(prices, out_temps, modes.tolist())
         temperature_deviations_cost, _ = temperature_contraints(results["room_temps"], not_home_hours, sleep_hours, low_deviation_cost, high_deviation_cost)
-        return sum(results["costs"]) + temperature_deviations_cost
+        return sum(results["Energy_cost_for_that_hour"]) + temperature_deviations_cost
     solution = minimize(objective, tuple(init_modes), options={"maxiter": 1e8}).x.tolist()
-    flexible_storage_optimized_costs = print_results(solution, prices, out_temps, not_home_hours, sleep_hours)["costs"]
-
-
-
-    # With Storage
-
-    def objective(modes):
-        results = simulate(prices, out_temps, modes.tolist())
-        temperature_deviations_cost, _ = temperature_contraints(results["room_temps"], not_home_hours, sleep_hours)
-        return sum(results["costs"]) + temperature_deviations_cost
-
-    solution = minimize(objective, tuple(init_modes), options={"maxiter": 1e8}).x.tolist()
-    storage_optimized_costs = print_results(solution, prices, out_temps, not_home_hours, sleep_hours)["costs"]
-
-
-    # Without Storage
-
-    def objective(modes):
-        results = simulate(prices, out_temps, modes.tolist(), storage=False)
-        temperature_deviations_cost, _ = temperature_contraints(results["room_temps"], not_home_hours, sleep_hours)
-        return sum(results["costs"]) + temperature_deviations_cost
-
-    solution = minimize(objective, tuple(init_power_modes), options={"maxiter": 1e8}).x.tolist()
-    optimized_costs = print_results(solution, prices, out_temps, not_home_hours, sleep_hours, storage=False)["costs"]
-
-
-    # Fixed power schedule
-
-    naive_costs = print_results(init_power_modes, prices, out_temps, not_home_hours, sleep_hours, storage=False)["costs"]
+    flexible_storage_optimized_costs = print_results(solution, prices, out_temps, not_home_hours, sleep_hours)["Energy_cost_for_that_hour"]
 
 
     # Comparison
 
-    plt.plot(np.cumsum(np.array(naive_costs)), label="Accumulated Cost Naive [€]")
-    plt.plot(np.cumsum(np.array(optimized_costs)), label="Accumulated Cost Optimized [€]")
-    plt.plot(np.cumsum(np.array(storage_optimized_costs)), label="Accumulated Cost Optimized + Storage [€]")
-    plt.plot(np.cumsum(np.array(flexible_storage_optimized_costs)), label="Accumulated Cost Optimized + Storage + Flexible [€]")
+    plt.plot(np.cumsum(np.array(naive_costs)), label="Naive")
+    plt.plot(np.cumsum(np.array(optimized_costs)), label="Optimized")
+    plt.plot(np.cumsum(np.array(storage_optimized_costs)), label="Optimized + Storage")
+    plt.plot(np.cumsum(np.array(flexible_storage_optimized_costs)), label="Optimized + Storage + Flexible")
+    plt.ylabel("Accumulated Cost [€]")
+    plt.xlabel("Time [hours]")
     plt.legend()
     plt.grid()
     plt.show()

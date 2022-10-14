@@ -2,7 +2,9 @@
 
 Heat pump optimization algorithm based on the challenge for the Aveiro Tech City Hackathon.
 
-# Setup
+![alt text](Architecture_Diagram.png)
+
+# Setup and Run
 
 For frontend:
 
@@ -37,6 +39,10 @@ For backend:
     ```poetry run flask --app api_electricity run --port=5001```
 
     ```poetry run flask --app api_temperature_Braganca run --port=5002```
+
+- Run continuous thermal model:
+
+    ```poetry run python thermal_model.py```
 
 
 # Repository Structure
