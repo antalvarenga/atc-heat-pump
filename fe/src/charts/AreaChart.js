@@ -60,7 +60,7 @@ const DefaultAreaChart = (props) => {
             <Area type="monotone" dataKey={props.yaxisStd} stroke={colors.blue} fillOpacity={1} fill="url(#colorBlue)" />
             {/* TODO */}
             {/* <Legend /> */}
-            <ReferenceLine y={124} stroke="green" label="Minimum Comfort Score" />
+            {props.hasReferenceLine && <ReferenceLine y={124} stroke="green" label="Minimum Comfort Score" />}
         </AreaChart>
     </ResponsiveContainer>
 }

@@ -6,9 +6,14 @@ const CustomTooltip = props => {
     }
   
     // Add the new label here with the label prop
-    const day = props.payload[0].payload.day
-    const hour = props.payload[0].payload.hour
-    return <DefaultTooltipContent {...props} label={`${day} ${hour}h`}/>;
+    let label = ""
+    if (props.payload[0]) {
+      const day = props.payload[0].payload.Date
+      const hour = props.payload[0].payload.hour
+      label = hour ? `${day} ${hour}h` : day
+
+    }
+    return <DefaultTooltipContent {...props} label={label}/>;
   };
 
 export default CustomTooltip

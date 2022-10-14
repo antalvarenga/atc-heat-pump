@@ -12,13 +12,21 @@ const formatter = (value, name, props) => {
       formattedName = "Temperatura exterior"
       formattedValue = value + " ºC"
       break;
+    case "MaxExternalTemperature":
+      formattedName = "Temperatura máxima exterior"
+      formattedValue = value + " ºC"
+      break;
+    case "MinExternalTemperature":
+      formattedName = "Temperatura mínima exterior"
+      formattedValue = value + " ºC"
+      break;
     case "EnergyConsumption":
       formattedName = "Controlo optimizado"
-      formattedValue = value + " kW"
+      formattedValue = Math.round(value * 1000) / 1000 + " kW"
       break;
     case "Standard_EnergyConsumption":
       formattedName = "Funcionamento típico"
-      formattedValue = value + " kW"
+      formattedValue = Math.round(value * 1000) / 1000 + " kW"
       break;
     default:
       formattedName = name
@@ -33,7 +41,7 @@ const DefaultLineChart = (props) => {
             <Line
                 type="monotone"
                 dataKey={props.yaxis}
-                stroke={props.yaxis == "ExternalTemperature" ? colors.red : colors.green}
+                stroke={["ExternalTemperature", "MaxExternalTemperature"].includes(props.yaxis) ? colors.red : colors.green}
             />
             <Line
                 type="monotone"

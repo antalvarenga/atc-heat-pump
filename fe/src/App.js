@@ -5,7 +5,7 @@ import DefaultLineChart from "./charts/DefaultLineChart";
 import AreaChart from "./charts/AreaChart";
 import Card from "@mui/material/Card";
 import { useEffect, useState } from "react";
-import { getHourlyData } from "./api";
+import { getDailyData, getHourlyData } from "./api";
 import BasicDatePicker from "./ui/BasicDatePicker";
 import MultipleSelect from "./ui/MultipleSelect";
 import Checkbox from '@mui/material/Checkbox';
@@ -36,15 +36,23 @@ function App() {
 
     useEffect(() => {
         async function getData() {
-            const newData = await getHourlyData({
-                start_date: startDate,
-                end_date: endDate,
-            });
+            let newData
+            if (showTotals) {
+                newData = await getDailyData({
+                    start_date: startDate,
+                    end_date: endDate,
+                });
+            } else {
+                newData = await getHourlyData({
+                    start_date: startDate,
+                    end_date: endDate,
+                });
+            }
             setData(newData);
         }
         getData();
         console.log("useEffect");
-    }, [startDate, endDate]);
+    }, [startDate, endDate, showTotals]);
 
     let isSingleDay = startDate === endDate;
 
@@ -93,7 +101,7 @@ function App() {
             </div> 
             {data && (
                 <div>
-                    {charts.includes("Modo de Funcionamento") && (
+                    {charts.includes("Modo de Funcionamento") && !showTotals && (
                         <Card {...cardStyles}>
                             <h2>Modo de Funcionamento</h2>
                             <ModeLineChart
@@ -109,7 +117,8 @@ function App() {
                             <h2>Temperatura (ºC)</h2>
                             <DefaultLineChart
                                 data={data}
-                                yaxis="ExternalTemperature"
+                                yaxis={showTotals ? "MaxExternalTemperature" : "ExternalTemperature"}
+                                yaxisStd={showTotals ? "MinExternalTemperature" : null}
                                 isSingleDay={isSingleDay}
                             />
                         </Card>
@@ -122,6 +131,7 @@ function App() {
                                 yaxis="AccumulatedComfortScore"
                                 yaxisStd="Standard_AccumulatedComfortScore"
                                 isSingleDay={isSingleDay}
+                                {...(showTotals ? {hasReferenceLine: false} : {hasReferenceLine: true})}
                             />
                         </Card>
                     )}
