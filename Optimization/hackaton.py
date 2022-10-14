@@ -1097,7 +1097,6 @@ def getAggratedData_Hourly(start_date, end_date):
         Energy_cost_for_that_complete_day = json_object[entry]['Energy_cost_for_that_complete_day']
         accumulated_energy_cost_that_hour = json_object[entry]['accumulated_energy_cost_that_hour']
         Energy_cost_for_that_hour = json_object[entry]['Energy_cost_for_that_hour']
-        Accumulated_daily_energy_cost_until_that_hour = json_object[entry]['Accumulated_daily_energy_cost_until_that_hour']
         Consumption_for_that_hour = json_object[entry]['Consumption_for_that_hour']
         Accumulated_daily_consumption_until_that_hour = json_object[entry]['Accumulated_daily_consumption_until_that_hour']
         Comfort_score_for_that_complete_day = json_object[entry]['Comfort_score_for_that_complete_day']
@@ -1114,29 +1113,35 @@ def getAggratedData_Hourly(start_date, end_date):
         Standard_Consumption_for_that_hour = results_policy[entry]['Consumption_for_that_hour']
         Standard_Accumulated_daily_consumption_until_that_hour = results_policy[entry]['Accumulated_daily_consumption_until_that_hour']
         Standard_Comfort_score_for_that_complete_day = results_policy[entry]['Comfort_score_for_that_complete_day']
+        Standard_AccumulatedEnergyConsumption = results_policy[entry]['Accumulated_daily_energy_cost_until_that_hour']
 
         aggreatedresults.append({
                 "hour": hour,
                 "mode": mode,
-                "day": day,
+                "Date": day,
                 "Energy_cost_for_that_complete_day": Energy_cost_for_that_complete_day,
-                "accumulated_energy_cost_that_hour": accumulated_energy_cost_that_hour,
+                "AccumulatedCost": accumulated_energy_cost_that_hour,
                 "Energy_cost_for_that_hour": Energy_cost_for_that_hour,
-                "Accumulated_daily_energy_cost_until_that_hour": Accumulated_daily_energy_cost_until_that_hour,
-                "Consumption_for_that_hour": Consumption_for_that_hour,
-                "Accumulated_daily_consumption_until_that_hour": Accumulated_daily_consumption_until_that_hour,
-                "Comfort_score_for_that_complete_day": Comfort_score_for_that_complete_day,
-                "Accumulated_daily_comfort_score_until_that_hour": Accumulated_daily_comfort_score_until_that_hour,
-                "exterior_temperature": exterior_temperature,
-                "energy_price": energy_price,
+                "EnergyComsumption": Consumption_for_that_hour,
+                "AccumulatedEnergyConsumption": Accumulated_daily_consumption_until_that_hour,
+                "ComfortScore": Comfort_score_for_that_complete_day,
+                "AccumulatedComfortScore": Accumulated_daily_comfort_score_until_that_hour,
+                "ExternalTemperature": exterior_temperature,
+                
+                #not avergaed... just to have equal between apis
+                "AvgEnergyHourlyPrice": energy_price,
+
                 "Standard_Mode": Standard_Mode,
-                "Standard_Energy_cost_for_that_complete_day": Standard_Energy_cost_for_that_complete_day,
+
+                #cost per hour
+                "Standard_AvgEnergyCostInADay": Standard_Energy_cost_for_that_complete_day,
                 "Standard_Accumulated_daily_energy_cost_until_that_hour": Standard_accumulated_energy_cost_that_hour,
-                "Standard_Energy_cost_for_that_hour": Standard_Energy_cost_for_that_hour,
+                "Standard_AvgEnergyCostInADay": Standard_Energy_cost_for_that_hour,
                 "Standard_Consumption_for_that_hour": Standard_Consumption_for_that_hour,
-                "Standard_Accumulated_daily_consumption_until_that_hour": Standard_Accumulated_daily_consumption_until_that_hour,
-                "Standard_Comfort_score_for_that_complete_day": Standard_Comfort_score_for_that_complete_day,
-                "Standard_Accumulated_daily_comfort_score_until_that_hour": Standard_Accumulated_daily_comfort_score_until_that_hour
+                "Standard_AvgEnergyConsumptionInADay": Standard_Accumulated_daily_consumption_until_that_hour,
+                "Standard_ComfortScore": Standard_Comfort_score_for_that_complete_day,
+                "Standard_AccumulatedComfortScore": Standard_Accumulated_daily_comfort_score_until_that_hour,
+                "Standard_AccumulatedEnergyConsumption":Standard_AccumulatedEnergyConsumption
             })
         
     return aggreatedresults
@@ -1234,7 +1239,8 @@ def getAggratedData_weekly(start_date, end_date):
             'AvgEnergyCostInADay': AvgEnergyCostInADay,
             'MaxEnergyConsumptionInADay': MaxEnergyConsumptionInADay,
             'MinEnergyConsumptionInADay': MinEnergyConsumptionInADay,
-            'AvgEnergyConsumptionInADay': AvgEnergyConsumptionInADay,
+            #avg
+            'EnergyConsumption': AvgEnergyConsumptionInADay,
             'AvgEnergyHourlyPrice': AvgEnergyHourlyPrice,
             'MaxEnergyHourlyPriceInAHour': MaxEnergyHourlyPriceInAHour,
             'MinEnergyHourlyPriceInAHour': MinEnergyHourlyPriceInAHour,
@@ -1243,18 +1249,19 @@ def getAggratedData_weekly(start_date, end_date):
             'MinExternalTemperature': MinExternalTemperature,
 
 
-            "Accumulated_comfort_across_days": accumulated_comfort_across_days,
-            'ConfortScore': daily_confort_score,
+            "AccumulatedComfortScore": accumulated_comfort_across_days,
+            'ComfortScore': daily_confort_score,
 
 
             'Standard_AccumulatedCost': Standard_AccumulatedCost,
-            'Standard_AccumulatedEnergyConsumption': Standard_AccumulatedEnergyConsumption,
+            'Standard_AvgEnergyConsumptionInADay': Standard_AccumulatedEnergyConsumption,
             'Standard_MaxEnergyCostInADay': Standard_MaxEnergyCostInADay,
             'Standard_MinEnergyCostInADay': Standard_MinEnergyCostInADay,
             'Standard_AvgEnergyCostInADay': Standard_AvgEnergyCostInADay,
             'Standard_MaxEnergyConsumptionInADay': Standard_MaxEnergyConsumptionInADay,
             'Standard_MinEnergyConsumptionInADay': Standard_MinEnergyConsumptionInADay,
-            'Standard_AvgEnergyConsumptionInADay': Standard_AvgEnergyConsumptionInADay,
+            #avg
+            'Standard_EnergyConsumption': Standard_AvgEnergyConsumptionInADay,
             'Standard_AvgEnergyHourlyPrice': Standard_AvgEnergyHourlyPrice,
             'Standard_MaxEnergyHourlyPriceInAHour': Standard_MaxEnergyHourlyPriceInAHour,
             'Standard_MinEnergyHourlyPriceInAHour': Standard_MinEnergyHourlyPriceInAHour,
@@ -1263,8 +1270,8 @@ def getAggratedData_weekly(start_date, end_date):
             'Standard_MinExternalTemperature': Standard_MinExternalTemperature,
             
 
-            'Standard_ConfortScore': standard_daily_confort_score,
-            'Standard_accumulated_comfort_across_days': standard_accumulated_comfort_across_days
+            'Standard_ComfortScore': standard_daily_confort_score,
+            'Standard_AccumulatedComfortScore': standard_accumulated_comfort_across_days
             
             })
         
@@ -1364,7 +1371,8 @@ def getAggratedData_free(start_date, end_date):
             'AvgEnergyCostInADay': AvgEnergyCostInADay,
             'MaxEnergyConsumptionInADay': max_energy_comsumption_hour,
             'MinEnergyConsumptionInADay': min_energy_comsumption_hour,
-            'AvgEnergyConsumptionInADay': AvgEnergyConsumptionInADay,
+            #avg
+            'EnergyConsumption': AvgEnergyConsumptionInADay,
             'AvgEnergyHourlyPrice': daily_avg_energy_price,
 
             'MaxEnergyHourlyPriceInAHour': MaxEnergyHourlyPriceInAHour,
@@ -1377,8 +1385,8 @@ def getAggratedData_free(start_date, end_date):
 
 
             #TODO: add on weekly endpoint
-            "Accumulated_comfort_across_days": accumulated_comfort_across_days,
-            'ConfortScore': daily_confort_score,
+            "AccumulatedComfortScore": accumulated_comfort_across_days,
+            'ComfortScore': daily_confort_score,
             ####
 
 
@@ -1393,7 +1401,8 @@ def getAggratedData_free(start_date, end_date):
 
             'Standard_MaxEnergyConsumptionInADay': standard_max_energy_comsumption_hour,
             'Standard_MinEnergyConsumptionInADay': standard_min_energy_comsumption_hour,
-            'Standard_AvgEnergyConsumptionInADay': standard_daily_energy_comsumption/24,
+            #avg
+            'Standard_EnergyConsumption': standard_daily_energy_comsumption/24,
 
 
 
@@ -1406,8 +1415,8 @@ def getAggratedData_free(start_date, end_date):
             'Standard_MaxExternalTemperature': Standard_MaxExternalTemperature,
             'Standard_MinExternalTemperature': Standard_MinExternalTemperature,
 
-            "Standard_ConfortScore": standard_daily_confort_score,
-            "Standard_accumulated_comfort_across_days": standard_accumulated_comfort_across_days
+            "Standard_ComfortScore": standard_daily_confort_score,
+            "Standard_AccumulatedComfortScore": standard_accumulated_comfort_across_days
             
 
             })
