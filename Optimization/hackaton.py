@@ -1113,7 +1113,7 @@ def getAggratedData_Hourly(start_date, end_date):
         Standard_Consumption_for_that_hour = results_policy[entry]['Consumption_for_that_hour']
         Standard_Accumulated_daily_consumption_until_that_hour = results_policy[entry]['Accumulated_daily_consumption_until_that_hour']
         Standard_Comfort_score_for_that_complete_day = results_policy[entry]['Comfort_score_for_that_complete_day']
-        Standard_AccumulatedEnergyConsumption = results_policy[entry]['Accumulated_daily_energy_cost_until_that_hour']
+        Standard_AccumulatedEnergyConsumption = results_policy[entry]['accumulated_energy_cost_that_hour']
 
         aggreatedresults.append({
                 "hour": hour,
@@ -1242,8 +1242,10 @@ def getAggratedData_weekly(start_date, end_date):
             #avg
             'EnergyConsumption': AvgEnergyConsumptionInADay,
             'AvgEnergyHourlyPrice': AvgEnergyHourlyPrice,
+
             'MaxEnergyHourlyPriceInAHour': MaxEnergyHourlyPriceInAHour,
             'MinEnergyHourlyPriceInAHour': MinEnergyHourlyPriceInAHour,
+
             'ExternalTemperatureAvg': ExternalTemperatureAvg,
             'MaxExternalTemperature': MaxExternalTemperature,
             'MinExternalTemperature': MinExternalTemperature,
@@ -1254,18 +1256,22 @@ def getAggratedData_weekly(start_date, end_date):
 
 
             'Standard_AccumulatedCost': Standard_AccumulatedCost,
-            'Standard_AvgEnergyConsumptionInADay': Standard_AccumulatedEnergyConsumption,
+            'Standard_AccumulatedEnergyConsumption': Standard_AccumulatedEnergyConsumption,
+            
             'Standard_MaxEnergyCostInADay': Standard_MaxEnergyCostInADay,
             'Standard_MinEnergyCostInADay': Standard_MinEnergyCostInADay,
             'Standard_AvgEnergyCostInADay': Standard_AvgEnergyCostInADay,
+            
             'Standard_MaxEnergyConsumptionInADay': Standard_MaxEnergyConsumptionInADay,
             'Standard_MinEnergyConsumptionInADay': Standard_MinEnergyConsumptionInADay,
             #avg
             'Standard_EnergyConsumption': Standard_AvgEnergyConsumptionInADay,
+            
             'Standard_AvgEnergyHourlyPrice': Standard_AvgEnergyHourlyPrice,
             'Standard_MaxEnergyHourlyPriceInAHour': Standard_MaxEnergyHourlyPriceInAHour,
             'Standard_MinEnergyHourlyPriceInAHour': Standard_MinEnergyHourlyPriceInAHour,
-            'Standard_AvgExternalTemperature': Standard_AvgExternalTemperature,
+            
+            'Standard_ExternalTemperatureAvg': Standard_AvgExternalTemperature,
             'Standard_MaxExternalTemperature': Standard_MaxExternalTemperature,
             'Standard_MinExternalTemperature': Standard_MinExternalTemperature,
             
@@ -1379,7 +1385,6 @@ def getAggratedData_free(start_date, end_date):
             'MinEnergyHourlyPriceInAHour': MinEnergyHourlyPriceInAHour,
             
             'ExternalTemperatureAvg': daily_temperature_avg,
-            
             'MaxExternalTemperature': MaxExternalTemperature,
             'MinExternalTemperature': MinExternalTemperature,
 
