@@ -8,15 +8,15 @@ const formatter = (value, name, props) => {
   let formattedName;
   let formattedValue;
   switch (name){
-    case "exterior_temperature":
+    case "ExternalTemperature":
       formattedName = "Temperatura exterior"
       formattedValue = value + " ºC"
       break;
-    case "Consumption_for_that_hour":
+    case "EnergyConsumption":
       formattedName = "Controlo optimizado"
       formattedValue = value + " kW"
       break;
-    case "Standard_Consumption_for_that_hour":
+    case "Standard_EnergyConsumption":
       formattedName = "Funcionamento típico"
       formattedValue = value + " kW"
       break;
@@ -33,7 +33,7 @@ const DefaultLineChart = (props) => {
             <Line
                 type="monotone"
                 dataKey={props.yaxis}
-                stroke={props.yaxis == "exterior_temperature" ? colors.red : colors.green}
+                stroke={props.yaxis == "ExternalTemperature" ? colors.red : colors.green}
             />
             <Line
                 type="monotone"
@@ -41,7 +41,7 @@ const DefaultLineChart = (props) => {
                 stroke={colors.blue}
             />
             <CartesianGrid stroke="#ccc" strokeDasharray="5 5" />
-            <XAxis dataKey={props.isSingleDay ? "hour" : "day"} tick={<CustomAxisTick isSingleDay={props.isSingleDay}/>} interval="preserveStartEnd"/>
+            <XAxis dataKey={props.isSingleDay ? "hour" : "Date"} tick={<CustomAxisTick isSingleDay={props.isSingleDay}/>} interval="preserveStartEnd"/>
             <YAxis dataKey={props.yaxis}/>
             <Tooltip content={<CustomTooltip formatter={formatter}/>} />
         </LineChart>

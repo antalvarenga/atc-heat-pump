@@ -8,27 +8,27 @@ const formatter = (value, name, props) => {
     let formattedName;
     let formattedValue;
     switch (name){
-      case "Accumulated_daily_consumption_until_that_hour":
+      case "AccumulatedEnergyConsumption":
         formattedName = "Controlo optimizado"
         formattedValue = Math.round(value * 1000) / 1000 + " kWh"
         break;
-      case "Accumulated_daily_comfort_score_until_that_hour":
+      case "AccumulatedComfortScore":
         formattedName = "Controlo optimizado"
         formattedValue = value
         break;
-      case "Standard_Accumulated_daily_comfort_score_until_that_hour":
+      case "Standard_AccumulatedComfortScore":
         formattedName = "Funcionamento típico"
         formattedValue = value
         break;
-      case "accumulated_energy_cost_that_hour":
+      case "AccumulatedCost":
         formattedName = "Controlo optimizado"
         formattedValue = Math.round(value * 100) / 100 + " €"
         break;
-      case "Standard_Accumulated_daily_energy_cost_until_that_hour":
+      case "Standard_AccumulatedCost":
         formattedName = "Funcionamento típico"
         formattedValue = Math.round(value * 100) / 100 + " €"
         break;
-      case "Standard_Accumulated_daily_consumption_until_that_hour":
+      case "Standard_AccumulatedEnergyConsumption":
         formattedName = "Funcionamento típico"
         formattedValue = Math.round(value * 100) / 100 + " kWh"
         break;
@@ -52,7 +52,7 @@ const DefaultAreaChart = (props) => {
                   <stop offset="95%" stopColor={colors.blue} stopOpacity={0}/>
                 </linearGradient>
             </defs>
-            <XAxis interval="preserveStartEnd" dataKey={props.isSingleDay ? "hour" : "day"} tick={<CustomAxisTick isSingleDay={props.isSingleDay}/>}/>
+            <XAxis interval="preserveStartEnd" dataKey={props.isSingleDay ? "hour" : "Date"} tick={<CustomAxisTick isSingleDay={props.isSingleDay}/>}/>
             <YAxis />
             <CartesianGrid strokeDasharray="3 3" />
             <Tooltip content={<CustomTooltip formatter={formatter}/>} />

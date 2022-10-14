@@ -109,7 +109,7 @@ function App() {
                             <h2>Temperatura (ºC)</h2>
                             <DefaultLineChart
                                 data={data}
-                                yaxis="exterior_temperature"
+                                yaxis="ExternalTemperature"
                                 isSingleDay={isSingleDay}
                             />
                         </Card>
@@ -119,8 +119,8 @@ function App() {
                             <h2>Comfort Score</h2>
                             <AreaChart
                                 data={data}
-                                yaxis="Accumulated_daily_comfort_score_until_that_hour"
-                                yaxisStd="Standard_Accumulated_daily_comfort_score_until_that_hour"
+                                yaxis="AccumulatedComfortScore"
+                                yaxisStd="Standard_AccumulatedComfortScore"
                                 isSingleDay={isSingleDay}
                             />
                         </Card>
@@ -130,8 +130,8 @@ function App() {
                             <h2>Potência (kW)</h2>
                             <DefaultLineChart
                                 data={data}
-                                yaxis="Consumption_for_that_hour"
-                                yaxisStd="Standard_Consumption_for_that_hour"
+                                yaxis="EnergyConsumption"
+                                yaxisStd="Standard_EnergyConsumption"
                                 isSingleDay={isSingleDay}
                             />
                         </Card>
@@ -141,8 +141,8 @@ function App() {
                             <h2>Consumo Energético (kWh)</h2>
                             <AreaChart
                                 data={data}
-                                yaxis="Accumulated_daily_consumption_until_that_hour"
-                                yaxisStd="Standard_Accumulated_daily_consumption_until_that_hour"
+                                yaxis="AccumulatedEnergyConsumption"
+                                yaxisStd="Standard_AccumulatedEnergyConsumption"
                                 xaxis="day"
                                 isSingleDay={isSingleDay}
                             />
@@ -153,8 +153,8 @@ function App() {
                             <h2>Custo Energético Acumulado (€)</h2>
                             <AreaChart
                                 data={data}
-                                yaxis="accumulated_energy_cost_that_hour"
-                                yaxisStd="Standard_Accumulated_daily_energy_cost_until_that_hour"
+                                yaxis="AccumulatedCost"
+                                yaxisStd="Standard_AccumulatedCost"
                                 xaxis="day"
                                 isSingleDay={isSingleDay}
                             />
