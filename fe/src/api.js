@@ -7,7 +7,11 @@ const api = axios.create({
 
 
 export const getHourlyData = async (params) => {
-    const resp = await api.get('/optimizeDaily/hourly', { params })
-    console.log("api call")
+    const resp = await api.get('/aggregated/hourly', { params })
+    return resp.data
+}
+
+export const getDailyData = async (params) => {
+    const resp = await api.get('/aggregated/free', { params })
     return resp.data
 }

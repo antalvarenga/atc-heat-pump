@@ -8,6 +8,7 @@ import { useEffect, useState } from "react";
 import { getHourlyData } from "./api";
 import BasicDatePicker from "./ui/BasicDatePicker";
 import MultipleSelect from "./ui/MultipleSelect";
+import Checkbox from '@mui/material/Checkbox';
 
 const cardStyles = {
     sx: {
@@ -25,11 +26,13 @@ const initialCharts = [
     "Custo Energético Acumulado",
 ];
 
+
 function App() {
     const [startDate, setStartDate] = useState("2021-12-01");
     const [endDate, setEndDate] = useState("2021-12-31");
     const [data, setData] = useState(null);
     const [charts, setCharts] = useState(initialCharts);
+    const [showTotals, setShowTotals] = useState(false);
 
     useEffect(() => {
         async function getData() {
@@ -44,6 +47,10 @@ function App() {
     }, [startDate, endDate]);
 
     let isSingleDay = startDate === endDate;
+
+    const onCheckboxChange = (event) => {
+        setShowTotals(event.target.checked)
+    }
 
     return (
         <div className="App">
@@ -81,6 +88,9 @@ function App() {
                     />
                 </div>
             </div>
+            <div style={{textAlign: "left"}}>
+                <Checkbox onChange={onCheckboxChange}/> Ver totais 
+            </div> 
             {data && (
                 <div>
                     {charts.includes("Modo de Funcionamento") && (
@@ -89,6 +99,7 @@ function App() {
                             <ModeLineChart
                                 data={data}
                                 yaxis="mode"
+                                yaxisStd="Standard_Mode"
                                 isSingleDay={isSingleDay}
                             />
                         </Card>
@@ -109,7 +120,7 @@ function App() {
                             <AreaChart
                                 data={data}
                                 yaxis="Accumulated_daily_comfort_score_until_that_hour"
-                                xaxis="day"
+                                yaxisStd="Standard_Accumulated_daily_comfort_score_until_that_hour"
                                 isSingleDay={isSingleDay}
                             />
                         </Card>
@@ -120,7 +131,7 @@ function App() {
                             <DefaultLineChart
                                 data={data}
                                 yaxis="Consumption_for_that_hour"
-                                xaxis="day"
+                                yaxisStd="Standard_Consumption_for_that_hour"
                                 isSingleDay={isSingleDay}
                             />
                         </Card>
@@ -131,6 +142,7 @@ function App() {
                             <AreaChart
                                 data={data}
                                 yaxis="Accumulated_daily_consumption_until_that_hour"
+                                yaxisStd="Standard_Accumulated_daily_consumption_until_that_hour"
                                 xaxis="day"
                                 isSingleDay={isSingleDay}
                             />
@@ -142,6 +154,7 @@ function App() {
                             <AreaChart
                                 data={data}
                                 yaxis="accumulated_energy_cost_that_hour"
+                                yaxisStd="Standard_Accumulated_daily_energy_cost_until_that_hour"
                                 xaxis="day"
                                 isSingleDay={isSingleDay}
                             />

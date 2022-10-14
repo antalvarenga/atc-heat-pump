@@ -19,7 +19,18 @@ function formatYAxis(value) {
   }
 
 const formatter = (value, name, props) => {
-  return [formatYAxis(value), "Modo"]
+  let formattedName;
+  switch (name){
+    case "mode":
+      formattedName = "Controlo optimizado"
+      break;
+    case "Standard_Mode":
+      formattedName = "Funcionamento típico"
+      break;
+    default:
+      formattedName = name
+  }
+  return [formatYAxis(value), formattedName]
 }
 
 const ModeLineChart = (props) => {
@@ -29,6 +40,11 @@ const ModeLineChart = (props) => {
                 type="monotone"
                 dataKey={props.yaxis}
                 stroke={colors.green}
+            />
+            <Line
+                type="monotone"
+                dataKey={props.yaxisStd}
+                stroke={colors.blue}
             />
             <CartesianGrid stroke="#ccc" strokeDasharray="5 5" />
             <XAxis interval="preserveStartEnd" dataKey={props.isSingleDay ? "hour" : "day"} tick={<CustomAxisTick isSingleDay={props.isSingleDay}/>}/>
