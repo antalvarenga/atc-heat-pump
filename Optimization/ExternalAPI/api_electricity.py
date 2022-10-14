@@ -1,7 +1,6 @@
 from electricity_prices import read_prices_JSON_Format
 from flask import Flask, jsonify, request
 from flask import url_for
-from electricity_prices import read_prices
 from datetime import datetime
 
 app = Flask(__name__)

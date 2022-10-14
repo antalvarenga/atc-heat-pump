@@ -2,7 +2,6 @@ from itertools import accumulate
 from scipy.optimize import linprog
 import numpy as np
 import math
-from electricity_prices import read_prices
 from datetime import datetime, timedelta
 import json
 import pandas as pd
