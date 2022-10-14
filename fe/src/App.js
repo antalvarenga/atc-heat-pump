@@ -143,6 +143,7 @@ function App() {
                                 yaxis="EnergyConsumption"
                                 yaxisStd="Standard_EnergyConsumption"
                                 isSingleDay={isSingleDay}
+                                hasTemperature
                             />
                         </Card>
                     )}

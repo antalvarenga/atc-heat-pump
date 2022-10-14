@@ -42,15 +42,25 @@ const DefaultLineChart = (props) => {
                 type="monotone"
                 dataKey={props.yaxis}
                 stroke={["ExternalTemperature", "MaxExternalTemperature"].includes(props.yaxis) ? colors.red : colors.green}
+                yAxisId="left"
             />
             <Line
                 type="monotone"
                 dataKey={props.yaxisStd}
                 stroke={colors.blue}
+                yAxisId="left"
             />
+            {props.hasTemperature &&             
+              <Line
+                  type="monotone"
+                  dataKey="ExternalTemperature"
+                  stroke={colors.red}
+                  yAxisId="right"
+              />}
             <CartesianGrid stroke="#ccc" strokeDasharray="5 5" />
             <XAxis dataKey={props.isSingleDay ? "hour" : "Date"} tick={<CustomAxisTick isSingleDay={props.isSingleDay}/>} interval="preserveStartEnd"/>
-            <YAxis dataKey={props.yaxis}/>
+            <YAxis yAxisId="left" dataKey={props.yaxis}/>
+            {props.hasTemperature && <YAxis yAxisId="right" orientation="right" dataKey="ExternalTemperature"/>}
             <Tooltip content={<CustomTooltip formatter={formatter}/>} />
         </LineChart>
     </ResponsiveContainer>
