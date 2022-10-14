@@ -13,7 +13,11 @@ const formatter = (value, name, props) => {
       formattedValue = value + " ºC"
       break;
     case "Consumption_for_that_hour":
-      formattedName = "Potência"
+      formattedName = "Controlo optimizado"
+      formattedValue = value + " kW"
+      break;
+    case "Standard_Consumption_for_that_hour":
+      formattedName = "Funcionamento típico"
       formattedValue = value + " kW"
       break;
     default:
@@ -29,7 +33,12 @@ const DefaultLineChart = (props) => {
             <Line
                 type="monotone"
                 dataKey={props.yaxis}
-                stroke={colors.green}
+                stroke={props.yaxis == "exterior_temperature" ? colors.red : colors.green}
+            />
+            <Line
+                type="monotone"
+                dataKey={props.yaxisStd}
+                stroke={colors.blue}
             />
             <CartesianGrid stroke="#ccc" strokeDasharray="5 5" />
             <XAxis dataKey={props.isSingleDay ? "hour" : "day"} tick={<CustomAxisTick isSingleDay={props.isSingleDay}/>} interval="preserveStartEnd"/>
